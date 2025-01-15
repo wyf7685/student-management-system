@@ -3,7 +3,7 @@ import hashlib
 from typing import Literal
 
 from .db_config import get_session, get_token
-from .models import Class, College, Course, Major, Student, SystemAccount
+from .models import Class, College, Course, Grade, Major, Student, SystemAccount
 
 
 class DBManager:
@@ -43,6 +43,10 @@ class DBManager:
     @classmethod
     def system_account(cls):
         return SystemAccountDBManager()
+
+    @classmethod
+    def grade(cls):
+        return GradeDBManager()
 
 
 class CollegeDBManager(DBManager):
@@ -333,3 +337,52 @@ class SystemAccountDBManager(DBManager):
             .first()
         )
         return account is not None
+
+
+class GradeDBManager(DBManager):
+    def get_grade(self, student_id: int, course_id: int) -> Grade | None:
+        return self.session.query(Grade).get((student_id, course_id))
+
+    def get_all_grades(self):
+        return self.session.query(Grade).all()
+
+    def exists_grade(self, student_id: int, course_id: int) -> bool:
+        return (
+            self.session.query(Grade)
+            .filter_by(student_id=student_id, course_id=course_id)
+            .count()
+            > 0
+        )
+
+    def add_grade(self, grade: Grade):
+        if self.exists_grade(grade.student_id, grade.course_id):
+            raise ValueError("成绩记录已存在")
+        self.session.add(grade)
+        self.session.commit()
+
+    def update_grade(
+        self,
+        student_id: int,
+        course_id: int,
+        *,
+        score: int | None = None,
+        term: str | None = None,
+    ):
+        grade = self.get_grade(student_id, course_id)
+        if not grade:
+            raise ValueError("成绩记录不存在")
+
+        if score is not None:
+            grade.score = score
+        if term is not None:
+            grade.term = term
+
+        self.session.commit()
+        return grade
+
+    def delete_grade(self, student_id: int, course_id: int):
+        grade = self.get_grade(student_id, course_id)
+        if not grade:
+            raise ValueError("成绩记录不存在")
+        self.session.delete(grade)
+        self.session.commit()
