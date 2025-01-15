@@ -75,6 +75,4 @@ class LoginWindow(QMainWindow):
             QMessageBox.warning(self, "错误", "用户名或密码错误！")
             return
 
-        # {"Admin": AdminMainWindow, "Student": StudentMainWindow}[role]().show()
-        # self.close()
         self.switch_window.emit(role, username)
