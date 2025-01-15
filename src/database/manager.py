@@ -46,7 +46,7 @@ class DBManager:
 
 
 class CollegeDBManager(DBManager):
-    def get_college(self, college_id: int):
+    def get_college(self, college_id: int) -> College | None:
         return self.session.query(College).get(college_id)
 
     def get_all_colleges(self):
