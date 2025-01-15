@@ -1,0 +1,11 @@
+from .award import Award as Award
+from .class_ import Class as Class
+from .club import Club as Club
+from .college import College as College
+from .course import Course as Course
+from .grade import Grade as Grade
+from .major import Major as Major
+from .student import Student as Student
+from .student_club import StudentClub as StudentClub
+from .student_status import StudentStatus as StudentStatus
+from .system_account import SystemAccount as SystemAccount
