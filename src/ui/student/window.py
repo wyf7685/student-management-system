@@ -10,8 +10,6 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from utils import check
-
 from ..user_window import BaseUserWindow
 
 
@@ -20,33 +18,6 @@ class StudentMainWindow(BaseUserWindow):
         # 设置窗口基本属性
         self.setWindowTitle("学生信息管理系统 - 学生端")
         self.setMinimumSize(800, 600)
-
-        # 创建菜单栏
-        menubar = check(self.menuBar())
-
-        # 信息查询菜单
-        info_menu = check(menubar.addMenu("信息查询"))
-        personal_info_action = check(info_menu.addAction("个人信息"))
-        personal_info_action.triggered.connect(lambda: self.switch_page(0))
-
-        # 教学管理菜单
-        teaching_menu = check(menubar.addMenu("教学管理"))
-        schedule_action = check(teaching_menu.addAction("课表查询"))
-        schedule_action.triggered.connect(lambda: self.switch_page(1))
-        exam_action = check(teaching_menu.addAction("考试查询"))
-        exam_action.triggered.connect(lambda: self.switch_page(2))
-        grade_action = check(teaching_menu.addAction("成绩查询"))
-        grade_action.triggered.connect(lambda: self.switch_page(3))
-
-        # 奖项管理菜单
-        award_menu = check(menubar.addMenu("奖项管理"))
-        award_action = check(award_menu.addAction("奖项查询"))
-        award_action.triggered.connect(lambda: self.switch_page(4))
-
-        # 系统菜单
-        system_menu = check(menubar.addMenu("系统"))
-        logout_action = check(system_menu.addAction("退出登录"))
-        logout_action.triggered.connect(self.handle_logout)
 
         # 创建中央部件
         central_widget = QWidget()
@@ -58,7 +29,7 @@ class StudentMainWindow(BaseUserWindow):
         title_label = QLabel("学生信息管理系统 - 学生端")
         title_label.setFont(QFont("Arial", 16, QFont.Weight.Bold))
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setStyleSheet("background-color: #f0f0f0; padding: 10px;")
+        title_label.setStyleSheet("padding: 10px;")
         main_layout.addWidget(title_label)
 
         # 创建堆叠窗口部件用于切换不同页面
