@@ -69,38 +69,23 @@ class Base(DeclarativeBase):
         ).lstrip("_")
 
 
-
 def setup_default_data():
-    from .manager import DBManager
-    from .models import Student
+    from pathlib import Path
 
-    student = {
-        "student_id": 2021010101,
-        "name": "张三",
-        "gender": "M",
-        "birth": "2003-01-01",
-        "phone": "13800138000",
-        "email": "zhangsan@xxx.edu.cn",
-        "college_id": 1,
-        "major_id": 1,
-        "class_id": 1,
-        "enrollment_date": "2021-09-01",
-    }
+    from sqlalchemy import text
 
-    db = DBManager.student()
-    if not db.get_student(111):
-        db.add_student(Student(**student))
+    stmts = [
+        s.strip()
+        for s in (Path(__file__).parent / "default.sql").read_text("utf-8").split(";")
+        if s.strip()
+    ]
 
-    db = DBManager.system_account()
-    if not db.find_account("Admin", "admin"):
-        db.add_account("Admin", "admin", "admin")
-    if not db.find_account("Student", "111"):
-        db.add_account("Student", "111", "pswd")
-    if not db.find_account("Teacher", "222"):
-        db.add_account("Teacher", "222", "pswd")
+    with get_engine().begin() as conn:
+        for stmt in stmts:
+            conn.execute(text(stmt))
 
 
 def create_all():
     Base.metadata.create_all(get_engine())
 
-    # setup_default_data()
+    setup_default_data()

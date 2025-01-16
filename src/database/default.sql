@@ -1,0 +1,82 @@
+INSERT INTO college (college_id, name)
+SELECT 1, '信息学院'
+WHERE NOT EXISTS (
+    SELECT 1 FROM college WHERE college_id = 1
+);
+
+INSERT INTO major (major_id, name, college_id)
+SELECT 11, '计算机科学与技术', 1
+WHERE NOT EXISTS (
+    SELECT 1 FROM major WHERE major_id = 11
+);
+
+INSERT INTO class (class_id, name, major_id, year)
+SELECT 111, '计算机科学与技术2301', 11, 2023
+WHERE NOT EXISTS (
+    SELECT 1 FROM class WHERE class_id = 111
+);
+
+INSERT INTO student (
+    student_id, name, gender, birth, phone, email,
+    college_id, major_id, class_id, enrollment_date
+)
+SELECT 
+    1111, '张三', 'M', '2005-01-01 00:00:00', '13800138000', 'zhangsan@example.com',
+    1, 11, 111, '2023-09-01'
+WHERE NOT EXISTS (
+    SELECT 1 FROM student WHERE student_id = 1111
+);
+
+INSERT INTO teacher (
+    teacher_id, name, gender, birth, phone, email
+)
+SELECT 
+    1001, '李四', 'M', '1980-01-01 00:00:00', '13900139000', 'lisi@example.com'
+WHERE NOT EXISTS (
+    SELECT 1 FROM teacher WHERE teacher_id = 1001
+);
+
+INSERT INTO system_account (
+    role, password, salt, student_id, teacher_id, admin_id
+)
+SELECT 
+    'Student', 
+    '697d423a3558f0ab2e71cea50014029628ee62cd154e1e81d5cd960932cce9b6',
+    'default',
+    1111,
+    NULL,
+    NULL
+WHERE NOT EXISTS (
+    SELECT 1 FROM system_account 
+    WHERE role = 'Student' AND student_id = 1111
+);
+
+INSERT INTO system_account (
+    role, password, salt, student_id, teacher_id, admin_id
+)
+SELECT 
+    'Teacher', 
+    '697d423a3558f0ab2e71cea50014029628ee62cd154e1e81d5cd960932cce9b6',
+    'default',
+    NULL,
+    1001,
+    NULL
+WHERE NOT EXISTS (
+    SELECT 1 FROM system_account 
+    WHERE role = 'Teacher' AND teacher_id = 1001
+);
+
+INSERT INTO system_account (
+    role, password, salt, student_id, teacher_id, admin_id
+)
+SELECT 
+    'Admin', 
+    '697d423a3558f0ab2e71cea50014029628ee62cd154e1e81d5cd960932cce9b6',
+    'default',
+    NULL,
+    NULL,
+    'admin'
+WHERE NOT EXISTS (
+    SELECT 1 FROM system_account 
+    WHERE role = 'Admin' AND admin_id = 'admin'
+);
