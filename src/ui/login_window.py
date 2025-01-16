@@ -1,4 +1,6 @@
-from PyQt6.QtCore import Qt, pyqtSignal
+from collections.abc import Callable
+
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
     QComboBox,
@@ -30,7 +32,7 @@ ROLE_CONVERT = {
 
 
 class LoginWindow(QMainWindow):
-    switch_window = pyqtSignal(str, str)
+    switch_window: Callable[[str, str], object]
 
     def __init__(self):
         super().__init__()
@@ -120,4 +122,4 @@ class LoginWindow(QMainWindow):
             return
 
         self.save_last_login(role, username)
-        self.switch_window.emit(role, username)
+        self.switch_window(role, username)
