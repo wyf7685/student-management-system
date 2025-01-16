@@ -126,15 +126,7 @@ class SettingsDialog(QDialog):
     def on_db_type_changed(self, db_type):
         """处理数据库类型变更"""
         self.switch_sqlite_visible(visible=db_type == "SQLite")
-
-        if config.db.type == "SQLite":
-            self.sqlite_path.setText(str(config.db.path))
-        else:
-            self.host_edit.setText(config.db.host)
-            self.port_edit.setText(str(config.db.port))
-            self.username_edit.setText(config.db.username)
-            self.password_edit.setText(config.db.password)
-            self.database_edit.setText(config.db.database)
+        self.load_settings()
 
         if db_type != "SQLite":
             # 设置默认端口
