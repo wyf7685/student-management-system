@@ -128,3 +128,33 @@ SELECT 105, '计算机网络', 3
 WHERE NOT EXISTS (
     SELECT 1 FROM course WHERE course_id = 105
 );
+-- 插入考试信息
+INSERT INTO exam (course_id, time, duration, name, description, location)
+SELECT 101, '2023-11-01 09:00:00', 120, '计算机组成原理', '期末考试', '教学楼A101'
+WHERE NOT EXISTS (
+    SELECT 1 FROM exam WHERE course_id = 101 AND time = '2023-11-01 09:00:00'
+);
+
+INSERT INTO exam (course_id, time, duration, name, description, location)
+SELECT 102, '2023-11-02 10:00:00', 150, '数据结构', '期末考试', '教学楼B202'
+WHERE NOT EXISTS (
+    SELECT 1 FROM exam WHERE course_id = 102 AND time = '2023-11-02 10:00:00'
+);
+
+INSERT INTO exam (course_id, time, duration, name, description, location)
+SELECT 103, '2023-11-03 11:00:00', 120, '操作系统', '期末考试', '教学楼C303'
+WHERE NOT EXISTS (
+    SELECT 1 FROM exam WHERE course_id = 103 AND time = '2023-11-03 11:00:00'
+);
+
+INSERT INTO exam (course_id, time, duration, name, description, location)
+SELECT 104, '2023-11-04 12:00:00', 150, '数据库系统', '期末考试', '教学楼D404'
+WHERE NOT EXISTS (
+    SELECT 1 FROM exam WHERE course_id = 104 AND time = '2023-11-04 12:00:00'
+);
+
+INSERT INTO exam (course_id, time, duration, name, description, location)
+SELECT 105, '2023-11-05 13:00:00', 120, '计算机网络', '期末考试', '教学楼E505'
+WHERE NOT EXISTS (
+    SELECT 1 FROM exam WHERE course_id = 105 AND time = '2023-11-05 13:00:00'
+);

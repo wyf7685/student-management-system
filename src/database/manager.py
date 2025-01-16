@@ -4,7 +4,17 @@ import uuid
 from typing import Literal
 
 from .db_config import get_session, get_token
-from .models import Class, College, Course, Grade, Major, Student, SystemAccount, Award
+from .models import (
+    Award,
+    Class,
+    College,
+    Course,
+    Exam,
+    Grade,
+    Major,
+    Student,
+    SystemAccount,
+)
 
 
 class DBManager:
@@ -51,7 +61,9 @@ class DBManager:
     @classmethod
     def award(cls):
         return AwardDBManager()
-
+    @classmethod
+    def exam(cls):
+        return ExamDBManager()
 
 class CollegeDBManager(DBManager):
     def get_college(self, college_id: int) -> College | None:
@@ -460,4 +472,57 @@ class AwardDBManager(DBManager):
         if not award:
             raise ValueError("奖项不存在")
         self.session.delete(award)
+        self.session.commit()
+class ExamDBManager(DBManager):
+    def get_exam(self, exam_id: int) -> Exam | None:
+        return self.session.query(Exam).get(exam_id)
+
+    def get_all_exams(self):
+        return self.session.query(Exam).all()
+
+    def exists_exam(self, exam_id: int) -> bool:
+        return self.session.query(Exam).filter_by(exam_id=exam_id).count() > 0
+
+    def add_exam(self, exam: Exam):
+        if self.exists_exam(exam.exam_id):
+            raise ValueError("考试记录已存在")
+        self.session.add(exam)
+        self.session.commit()
+
+    def update_exam(
+        self,
+        exam_id: int,
+        *,
+        course_id: int | None = None,
+        time: datetime.datetime | None = None,
+        duration: int | None = None,
+        name: str | None = None,
+        description: str | None = None,
+        location: str | None = None,
+    ):
+        exam = self.get_exam(exam_id)
+        if not exam:
+            raise ValueError("考试记录不存在")
+
+        if course_id is not None:
+            exam.course_id = course_id
+        if time is not None:
+            exam.time = time
+        if duration is not None:
+            exam.duration = duration
+        if name is not None:
+            exam.name = name
+        if description is not None:
+            exam.description = description
+        if location is not None:
+            exam.location = location
+
+        self.session.commit()
+        return exam
+
+    def delete_exam(self, exam_id: int):
+        exam = self.get_exam(exam_id)
+        if not exam:
+            raise ValueError("考试记录不存在")
+        self.session.delete(exam)
         self.session.commit()
