@@ -9,6 +9,7 @@ from .models import Major as Major
 from .models import Student as Student
 from .models import StudentClub as StudentClub
 from .models import StudentStatus as StudentStatus
+from .models import SystemAccount as SystemAccount
 
 
 def __init():
