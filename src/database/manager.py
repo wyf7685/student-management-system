@@ -4,7 +4,18 @@ import uuid
 from typing import Literal
 
 from .db_config import get_session, get_token
-from .models import Class, College, Course, Grade, Major, Student, SystemAccount, Award
+from .models import (
+    Award,
+    Class,
+    Club,
+    College,
+    Course,
+    Grade,
+    Major,
+    Student,
+    StudentClub,
+    SystemAccount,
+)
 
 
 class DBManager:
@@ -48,9 +59,18 @@ class DBManager:
     @classmethod
     def grade(cls):
         return GradeDBManager()
+
     @classmethod
     def award(cls):
         return AwardDBManager()
+
+    @classmethod
+    def club(cls):
+        return ClubDBManager()
+
+    @classmethod
+    def student_club(cls):
+        return StudentClubDBManager()
 
 
 class CollegeDBManager(DBManager):
@@ -460,4 +480,83 @@ class AwardDBManager(DBManager):
         if not award:
             raise ValueError("奖项不存在")
         self.session.delete(award)
+        self.session.commit()
+
+
+class ClubDBManager(DBManager):
+    def get_club(self, club_id: int) -> Club | None:
+        return self.session.query(Club).get(club_id)
+
+    def get_all_clubs(self):
+        return self.session.query(Club).all()
+
+    def exists_club(self, club_id: int) -> bool:
+        return self.session.query(Club).filter_by(club_id=club_id).count() > 0
+
+    def add_club(self, club: Club):
+        if self.exists_club(club.club_id):
+            raise ValueError("社团已存在")
+        self.session.add(club)
+        self.session.commit()
+
+    def update_club(
+        self,
+        club_id: int,
+        *,
+        name: str | None = None,
+        description: str | None = None,
+    ):
+        club = self.get_club(club_id)
+        if not club:
+            raise ValueError("社团不存在")
+
+        if name is not None:
+            club.name = name
+        if description is not None:
+            club.description = description
+
+        self.session.commit()
+        return club
+
+    def delete_club(self, club_id: int):
+        club = self.get_club(club_id)
+        if not club:
+            raise ValueError("社团不存在")
+        self.session.delete(club)
+        self.session.commit()
+
+
+class StudentClubDBManager(DBManager):
+    def get_student_club(self, student_id: int, club_id: int) -> StudentClub | None:
+        return self.session.query(StudentClub).get((student_id, club_id))
+
+    def get_all_student_clubs(self):
+        return self.session.query(StudentClub).all()
+
+    def get_clubs_by_student(self, student_id: int):
+        return self.session.query(StudentClub).filter_by(student_id=student_id).all()
+
+    def get_students_by_club(self, club_id: int):
+        return self.session.query(StudentClub).filter_by(club_id=club_id).all()
+
+    def exists_student_club(self, student_id: int, club_id: int) -> bool:
+        return (
+            self.session.query(StudentClub)
+            .filter_by(student_id=student_id, club_id=club_id)
+            .count()
+            > 0
+        )
+
+    def add_student_club(self, student_id: int, club_id: int):
+        if self.exists_student_club(student_id, club_id):
+            raise ValueError("学生社团关系已存在")
+        student_club = StudentClub(student_id=student_id, club_id=club_id)
+        self.session.add(student_club)
+        self.session.commit()
+
+    def delete_student_club(self, student_id: int, club_id: int):
+        student_club = self.get_student_club(student_id, club_id)
+        if not student_club:
+            raise ValueError("学生社团关系不存在")
+        self.session.delete(student_club)
         self.session.commit()
