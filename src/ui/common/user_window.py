@@ -16,8 +16,8 @@ from PyQt6.QtWidgets import (
 
 from utils import check
 
-from ..dialog.about import AboutWindow
-from ..dialog.settings import SettingsWindow
+from ..dialog.about import AboutDialog
+from ..dialog.settings import SettingsDialog
 
 if TYPE_CHECKING:
     from .page import BasePage
@@ -45,14 +45,14 @@ class BaseUserWindow(QMainWindow):
         # 文件菜单
         file_menu = check(self.menubar.addMenu("文件"))
         settings_action = check(file_menu.addAction("设置"))
-        settings_action.triggered.connect(lambda: SettingsWindow(self).exec())
+        settings_action.triggered.connect(lambda: SettingsDialog(self).exec())
         action = check(file_menu.addAction("退出登录"))
         action.triggered.connect(self.handle_logout)
 
         # 帮助菜单
         help_menu = check(self.menubar.addMenu("帮助"))
         about_action = check(help_menu.addAction("关于"))
-        about_action.triggered.connect(lambda: AboutWindow(self).exec())
+        about_action.triggered.connect(lambda: AboutDialog(self).exec())
 
     def create_status_bar(self) -> None:
         self.status_bar = check(self.statusBar())

@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (
 from const import AUTHORS, COPYRIGHT, VERSION
 
 
-class AboutWindow(QDialog):
+class AboutDialog(QDialog):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.setWindowTitle("关于")

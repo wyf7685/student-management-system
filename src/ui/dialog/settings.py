@@ -18,7 +18,7 @@ from config import ServerConfig, SqliteConfig, config
 from database.db_config import reload_engine
 
 
-class SettingsWindow(QDialog):
+class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("设置")
