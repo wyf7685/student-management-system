@@ -98,3 +98,33 @@ SELECT 3, 1111, '学术论文发表奖', '2023-05-15'
 WHERE NOT EXISTS (
     SELECT 1 FROM award WHERE award_id = 3
 );
+-- 插入课程信息
+INSERT INTO course (course_id, name, credits)
+SELECT 101, '计算机组成原理', 3
+WHERE NOT EXISTS (
+    SELECT 1 FROM course WHERE course_id = 101
+);
+
+INSERT INTO course (course_id, name, credits)
+SELECT 102, '数据结构', 3
+WHERE NOT EXISTS (
+    SELECT 1 FROM course WHERE course_id = 102
+);
+
+INSERT INTO course (course_id, name, credits)
+SELECT 103, '操作系统', 3
+WHERE NOT EXISTS (
+    SELECT 1 FROM course WHERE course_id = 103
+);
+
+INSERT INTO course (course_id, name, credits)
+SELECT 104, '数据库系统', 3
+WHERE NOT EXISTS (
+    SELECT 1 FROM course WHERE course_id = 104
+);
+
+INSERT INTO course (course_id, name, credits)
+SELECT 105, '计算机网络', 3
+WHERE NOT EXISTS (
+    SELECT 1 FROM course WHERE course_id = 105
+);
