@@ -52,7 +52,7 @@ class CourseEnrollment(Base):
     course_id: Mapped[int] = mapped_column(
         Integer,
         ForeignKey(Course.course_id),
-        nullable=False,
+        primary_key=True,
     )
     semester: Mapped[str] = mapped_column(String(50), nullable=False)
     course_status: Mapped[EnrollmentsStatusCode] = mapped_column(
