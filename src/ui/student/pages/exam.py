@@ -1,5 +1,6 @@
-from PyQt6.QtWidgets import QTableWidget, QTableWidgetItem, QVBoxLayout, QLabel
 from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QLabel, QTableWidget, QTableWidgetItem, QVBoxLayout
+
 from database.manager import DBManager
 from database.models import Exam
 from ui.common.page import BasePage
