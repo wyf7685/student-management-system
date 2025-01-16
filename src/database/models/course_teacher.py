@@ -2,7 +2,7 @@ from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ..db_config import Base
-from .tearchers import Tearcher
+from .tearcher import Tearcher
 
 
 class CourseTeacher(Base):
