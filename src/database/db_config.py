@@ -105,4 +105,4 @@ def create_all():
                     password=hashlib.sha256(b"teacher").hexdigest(),
                 )
             )
-            session.commit()                
+            session.commit()
