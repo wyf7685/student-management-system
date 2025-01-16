@@ -14,13 +14,13 @@ from utils import check
 
 
 class CoursePage(BasePage):
-    button_name = "课表查询"
+    button_name = "课程信息查询"
 
     def init_ui(self):
         layout = QVBoxLayout()
 
         # 添加标题
-        title_label = QLabel("课表查询")
+        title_label = QLabel("课程信息查询")
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
         layout.addWidget(title_label)

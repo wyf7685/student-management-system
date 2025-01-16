@@ -183,3 +183,33 @@ WHERE NOT EXISTS (
     SELECT 1 FROM student_club 
     WHERE student_id = 1111 AND club_id = 2
 );
+-- 插入成绩信息
+INSERT INTO grade (student_id, course_id, score, term)
+SELECT 1111, 101, 90, '2023-2024-1'
+WHERE NOT EXISTS (
+    SELECT 1 FROM grade WHERE student_id = 1111 AND course_id = 101 AND term = '2023-2024-1'
+);
+
+INSERT INTO grade (student_id, course_id, score, term)
+SELECT 1111, 102, 85, '2023-2024-1'
+WHERE NOT EXISTS (
+    SELECT 1 FROM grade WHERE student_id = 1111 AND course_id = 102 AND term = '2023-2024-1'
+);
+
+INSERT INTO grade (student_id, course_id, score, term)
+SELECT 1111, 103, 88, '2023-2024-1'
+WHERE NOT EXISTS (
+    SELECT 1 FROM grade WHERE student_id = 1111 AND course_id = 103 AND term = '2023-2024-1'
+);
+
+INSERT INTO grade (student_id, course_id, score, term)
+SELECT 1111, 104, 92, '2023-2024-1'
+WHERE NOT EXISTS (
+    SELECT 1 FROM grade WHERE student_id = 1111 AND course_id = 104 AND term = '2023-2024-1'
+);
+
+INSERT INTO grade (student_id, course_id, score, term)
+SELECT 1111, 105, 87, '2023-2024-1'
+WHERE NOT EXISTS (
+    SELECT 1 FROM grade WHERE student_id = 1111 AND course_id = 105 AND term = '2023-2024-1'
+);
