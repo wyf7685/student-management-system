@@ -60,7 +60,7 @@ class LoginWindow(QMainWindow):
         login_button = QPushButton("登录")
         login_button.clicked.connect(self.handle_login)
         main_layout.addWidget(login_button)
-
+        
     def handle_login(self):
         role = self.role_combo.currentText()
         username = self.username_input.text()
