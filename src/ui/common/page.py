@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, ClassVar, cast
 
 from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import QWidget
@@ -15,6 +15,13 @@ class BasePage(QWidget):
         super().__init__(parent)
         self.status_update.connect(parent.status_update.emit)
         self.init_ui()
+
+    def parent(self) -> "BaseUserWindow":
+        return cast("BaseUserWindow", super().parent())
+
+    @property
+    def user_id(self) -> str:
+        return self.parent().user_id
 
     def init_ui(self) -> None:
         raise NotImplementedError

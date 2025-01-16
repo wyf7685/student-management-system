@@ -1,5 +1,3 @@
-import hashlib
-
 from sqlalchemy import URL, Engine, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session, declared_attr, sessionmaker
 from sqlalchemy.util import immutabledict
@@ -67,42 +65,42 @@ class Base(DeclarativeBase):
         # 例如: StudentInfo -> student_info
         name = cls.__name__
         return "".join(
-            "_" + c.lower() if c.isupper() else c.lower() for c in name
+            f"_{c.lower()}" if c.isupper() else c.lower() for c in name
         ).lstrip("_")
+
+
+
+def setup_default_data():
+    from .manager import DBManager
+    from .models import Student
+
+    student = {
+        "student_id": 2021010101,
+        "name": "张三",
+        "gender": "M",
+        "birth": "2003-01-01",
+        "phone": "13800138000",
+        "email": "zhangsan@xxx.edu.cn",
+        "college_id": 1,
+        "major_id": 1,
+        "class_id": 1,
+        "enrollment_date": "2021-09-01",
+    }
+
+    db = DBManager.student()
+    if not db.get_student(111):
+        db.add_student(Student(**student))
+
+    db = DBManager.system_account()
+    if not db.find_account("Admin", "admin"):
+        db.add_account("Admin", "admin", "admin")
+    if not db.find_account("Student", "111"):
+        db.add_account("Student", "111", "pswd")
+    if not db.find_account("Teacher", "222"):
+        db.add_account("Teacher", "222", "pswd")
 
 
 def create_all():
     Base.metadata.create_all(get_engine())
 
-    from .models import SystemAccount
-
-    with get_session() as session:
-        if not session.query(SystemAccount).filter_by(username="admin").count():
-            session.add(
-                SystemAccount(
-                    role="Admin",
-                    username="admin",
-                    password=hashlib.sha256(b"admin").hexdigest(),
-                )
-            )
-            session.commit()
-    with get_session() as session:
-        if not session.query(SystemAccount).filter_by(username="stu").count():
-            session.add(
-                SystemAccount(
-                    role="Student",
-                    username="stu",
-                    password=hashlib.sha256(b"stu").hexdigest(),
-                )
-            )
-            session.commit()
-    with get_session() as session:
-        if not session.query(SystemAccount).filter_by(username="teacher").count():
-            session.add(
-                SystemAccount(
-                    role="Teacher",
-                    username="teacher",
-                    password=hashlib.sha256(b"teacher").hexdigest(),
-                )
-            )
-            session.commit()
+    # setup_default_data()

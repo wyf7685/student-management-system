@@ -1,5 +1,6 @@
 import datetime
 import hashlib
+import uuid
 from typing import Literal
 
 from .db_config import get_session, get_token
@@ -282,6 +283,20 @@ class CourseDBManager(DBManager):
 
 
 class SystemAccountDBManager(DBManager):
+    @staticmethod
+    def encode_password(password: str) -> str:
+        return hashlib.sha256(password.encode()).hexdigest()
+
+    @staticmethod
+    def convert_user_id(role: str, user_id: str) -> dict[str, str | int]:
+        if role == "Student":
+            return {"student_id": int(user_id)}
+        if role == "Teacher":
+            return {"teacher_id": int(user_id)}
+        if role == "Admin":
+            return {"admin_id": user_id}
+        raise ValueError("Invalid role")
+
     def get_account(self, account_id: int) -> SystemAccount | None:
         return self.session.query(SystemAccount).get(account_id)
 
@@ -289,17 +304,21 @@ class SystemAccountDBManager(DBManager):
         return self.session.query(SystemAccount).all()
 
     def find_account(self, role: str, username: str) -> SystemAccount | None:
-        return (
-            self.session.query(SystemAccount)
-            .filter_by(role=role, username=username)
-            .first()
-        )
+        kwds = {"role": role} | self.convert_user_id(role, username)
+        return self.session.query(SystemAccount).filter_by(**kwds).first()
 
     def exists_account(self, role: str, username: str):
         return self.find_account(role, username) is not None
 
-    def add_account(self, account: SystemAccount):
-        self.session.add(account)
+    def add_account(self, role: str, username: str, password: str):
+        salt = str(uuid.uuid4())
+        kwds: dict[str, str | int] = {
+            "role": role,
+            "password": self.encode_password(password + salt),
+            "salt": salt,
+            **self.convert_user_id(role, username),
+        }
+        self.session.add(SystemAccount(**kwds))
         self.session.commit()
 
     def update_account(
@@ -319,9 +338,10 @@ class SystemAccountDBManager(DBManager):
                 raise ValueError("角色必须为 Student, Teacher, Admin 中的一个")
             account.role = role
         if username is not None:
-            account.username = username
+            account.user_id = username
         if password is not None:
-            account.password = password
+            account.salt = str(uuid.uuid4())
+            account.password = self.encode_password(password + account.salt)
 
         self.session.commit()
         return account
@@ -334,17 +354,12 @@ class SystemAccountDBManager(DBManager):
         self.session.commit()
 
     def check_login(self, role: str, username: str, password: str):
-        password = hashlib.sha256(password.encode()).hexdigest()
-        account = (
-            self.session.query(SystemAccount)
-            .filter_by(
-                role=role,
-                username=username,
-                password=password,
-            )
-            .first()
+        kwds = {"role": role} | self.convert_user_id(role, username)
+        account = self.session.query(SystemAccount).filter_by(**kwds).first()
+        return (
+            account is not None
+            and self.encode_password(password + account.salt) == account.password
         )
-        return account is not None
 
 
 class GradeDBManager(DBManager):

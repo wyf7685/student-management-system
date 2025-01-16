@@ -12,4 +12,4 @@ from .student import Student as Student
 from .student_club import StudentClub as StudentClub
 from .student_status import StudentStatus as StudentStatus
 from .system_account import SystemAccount as SystemAccount
-from .tearcher import Tearcher as Tearcher
+from .teacher import Teacher as Teacher
