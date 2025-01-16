@@ -6,7 +6,11 @@ from .student import Student
 
 
 class Scholarship(Base):
-    scholarship_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    scholarship_id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
     scholarship_name: Mapped[str] = mapped_column(String, nullable=False)
     student_id: Mapped[int] = mapped_column(
         Integer,

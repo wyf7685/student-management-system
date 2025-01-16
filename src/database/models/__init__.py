@@ -5,6 +5,7 @@ from .college import College as College
 from .course import Course as Course
 from .course_enrollment import CourseEnrollment as CourseEnrollment
 from .course_teacher import CourseTeacher as CourseTeacher
+from .exam import Exam as Exam
 from .grade import Grade as Grade
 from .major import Major as Major
 from .scholarship import Scholarship as Scholarship
