@@ -14,13 +14,14 @@ class BasePage(QWidget):
     def __init__(self, parent: "BaseUserWindow") -> None:
         super().__init__(parent)
         self._parent = parent
+        self.status_update.connect(parent.status_update.emit)
         self.init_ui()
 
     def get_user_id(self) -> str:
         return self._parent.user_id
 
     def update_status(self, status: str) -> None:
-        self._parent.status_update.emit(status)
+        self.status_update.emit(status)
 
     def on_error(self, message: str) -> None:
         self.update_status(f"错误: {message}")

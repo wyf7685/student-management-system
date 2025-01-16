@@ -13,7 +13,7 @@ class StudentMainWindow(BaseUserWindow):
         w = QWidget()
         layout = QHBoxLayout()
         w.setLayout(layout)
-        spacer = QSpacerItem(90, 20)
+        spacer = QSpacerItem(70, 20)
         layout.addSpacerItem(spacer)
         layout.addWidget(widget)
         layout.addSpacerItem(spacer)
