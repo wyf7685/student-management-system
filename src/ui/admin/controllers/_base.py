@@ -1,22 +1,32 @@
+from collections.abc import Callable
+from typing import TYPE_CHECKING
+
 from PyQt6.QtCore import QObject, pyqtSignal
 
-from ..common import get_admin_main
+from database.manager import DBManager
+
+if TYPE_CHECKING:
+    from ..page import BasePage
 
 
-class BaseController(QObject):
+class BaseController[D: DBManager](QObject):
     added = pyqtSignal(object)
     updated = pyqtSignal(object)
     deleted = pyqtSignal(int)
     operation_error = pyqtSignal(str)
+    status_update = pyqtSignal(str)
 
-    def __init__(self) -> None:
-        super().__init__()
-        self.__error_connected = False
+    dbm_factory: Callable[[], D]
+    db: D
+
+    def __init__(self, parent: "BasePage") -> None:
+        super().__init__(parent)
+        self.db = self.dbm_factory()
+        self.operation_error.connect(parent.status_update.emit)
+        self.status_update.connect(parent.status_update.emit)
 
     def error(self, error: str):
-        if not self.__error_connected:
-            self.operation_error.connect(get_admin_main().status_update.emit)
-            self.__error_connected = True
+        self.db.rollback()
 
         if "FOREIGN KEY" in error:
             error = f"外键约束错误，请检查数据是否存在关联\n{error}"
@@ -25,14 +35,11 @@ class BaseController(QObject):
         return False
 
     def success(self, status: str):
-        get_admin_main().status_update.emit(status)
+        self.status_update.emit(status)
         return True
 
-
-class DBRollbackMixin:
-    def error(self, error: str):
-        self.db.rollback()  # type:ignore[]
-        return super().error(error)  # type:ignore[]
+    def init_db(self) -> None:
+        pass
 
 
 def make_checker(name: str):

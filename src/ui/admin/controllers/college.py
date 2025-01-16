@@ -1,12 +1,11 @@
-from database import College, DBManager
+from database import College
+from database.manager import CollegeDBManager
 
-from ._base import BaseController, DBRollbackMixin, check_college_id
+from ._base import BaseController, check_college_id
 
 
-class CollegeController(DBRollbackMixin, BaseController):
-    def __init__(self) -> None:
-        super().__init__()
-        self.db = DBManager.college()
+class CollegeController(BaseController[CollegeDBManager]):
+    dbm_factory = CollegeDBManager
 
     def add(self, college_id: str, name: str) -> bool:
         """添加新学院"""

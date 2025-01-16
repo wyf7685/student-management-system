@@ -3,15 +3,14 @@
 from datetime import datetime
 from typing import Literal
 
-from database import DBManager, Student
+from database import Student
+from database.manager import StudentDBManager
 
-from ._base import BaseController, DBRollbackMixin, check_student_id
+from ._base import BaseController, check_student_id
 
 
-class StudentController(DBRollbackMixin, BaseController):
-    def __init__(self) -> None:
-        super().__init__()
-        self.db = DBManager.student()
+class StudentController(BaseController[StudentDBManager]):
+    dbm_factory = StudentDBManager
 
     def add(
         self,

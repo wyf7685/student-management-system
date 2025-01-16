@@ -3,12 +3,13 @@ from .class_ import Class as Class
 from .club import Club as Club
 from .college import College as College
 from .course import Course as Course
-from .course_enrollments import CourseEnrollment as CourseEnrollment
+from .course_enrollment import CourseEnrollment as CourseEnrollment
 from .course_teacher import CourseTeacher as CourseTeacher
 from .grade import Grade as Grade
 from .major import Major as Major
+from .scholarship import Scholarship as Scholarship
 from .student import Student as Student
 from .student_club import StudentClub as StudentClub
 from .student_status import StudentStatus as StudentStatus
 from .system_account import SystemAccount as SystemAccount
-from .tearchers import Tearcher as Tearcher
+from .tearcher import Tearcher as Tearcher

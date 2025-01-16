@@ -57,7 +57,7 @@ class CourseEnrollment(Base):
     semester: Mapped[str] = mapped_column(String(50), nullable=False)
     coures_status: Mapped[EnrollmentsStatusCode] = mapped_column(
         Integer,
-        CheckConstraint("coures_status IN (1, 2, 3, 4, 5,6,7,8)"),
+        CheckConstraint("coures_status IN (1, 2, 3, 4, 5, 6, 7, 8)"),
         nullable=False,
     )
 

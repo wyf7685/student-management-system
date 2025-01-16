@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import (
 
 from ..common import BaseConfirmDialog, BaseContextMenuHandler, check
 from ..controllers.class_ import ClassController
-from ._base import BaseTab
+from ..page import BasePage
 
 
 class AddDialog(BaseConfirmDialog):
@@ -129,8 +129,8 @@ class ContextMenuHandler(BaseContextMenuHandler[ClassController]):
             self.handlers[check(self.menu.addAction("删除"))] = self.handle_delete
 
 
-class ClassTab(BaseTab[ClassController]):
-    tab_name = "班级"
+class ClassPage(BasePage[ClassController]):
+    button_name = "班级"
     handler_cls = ContextMenuHandler
     columns = "班级代码", "班级名称", "专业代码", "年级"
     controller_cls = ClassController

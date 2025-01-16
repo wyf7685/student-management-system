@@ -1,10 +1,8 @@
-from PyQt6.QtCore import pyqtSignal
+from ui.common.user_window import BaseUserWindow
 
-from ..user_window import BaseUserWindow
+# from .pages import PAGES
 
 
 class TeacherMainWindow(BaseUserWindow):
-    logout_signal = pyqtSignal()
-
-    def init_ui(self):
-        pass
+    title = "学生信息管理系统 - 教师端"
+    page_cls = ()
