@@ -16,6 +16,7 @@ from .models import (
     Student,
     StudentClub,
     SystemAccount,
+    Scholarship
 )
 
 
@@ -75,7 +76,9 @@ class DBManager:
     @classmethod
     def student_club(cls):
         return StudentClubDBManager()
-
+    @classmethod
+    def scholarship(cls):
+        return ScholarshipDBManager()
 
 class CollegeDBManager(DBManager):
     def get_college(self, college_id: int) -> College | None:
@@ -623,4 +626,62 @@ class StudentClubDBManager(DBManager):
         if not student_club:
             raise ValueError("学生社团关系不存在")
         self.session.delete(student_club)
+        self.session.commit()
+class ScholarshipDBManager(DBManager):
+    def get_scholarship(self, scholarship_id: int) -> Scholarship | None:
+        return self.session.query(Scholarship).get(scholarship_id)
+
+    def get_all_scholarships(self):
+        return self.session.query(Scholarship).all()
+
+    def get_scholarships_by_student(self, student_id: int):
+        return self.session.query(Scholarship).filter_by(student_id=student_id).all()
+
+    def exists_scholarship(self, scholarship_id: int) -> bool:
+        return (
+            self.session.query(Scholarship)
+            .filter_by(scholarship_id=scholarship_id)
+            .count()
+            > 0
+        )
+
+    def add_scholarship(self, scholarship: Scholarship):
+        if self.exists_scholarship(scholarship.scholarship_id):
+            raise ValueError("奖学金记录已存在")
+        self.session.add(scholarship)
+        self.session.commit()
+
+    def update_scholarship(
+        self,
+        scholarship_id: int,
+        *,
+        student_id: int | None = None,
+        scholarship_name: str | None = None,
+        amount: int | None = None,  # 保持为 int 类型，根据你的模型定义
+        date_awarded: str | None = None,
+        description: str | None = None,
+    ):
+        scholarship = self.get_scholarship(scholarship_id)
+        if not scholarship:
+            raise ValueError("奖学金记录不存在")
+
+        if student_id is not None:
+            scholarship.student_id = student_id
+        if scholarship_name is not None:
+            scholarship.scholarship_name = scholarship_name
+        if amount is not None:
+            scholarship.amount = amount
+        if date_awarded is not None:
+            scholarship.date_awarded = date_awarded
+        if description is not None:
+            scholarship.description = description
+
+        self.session.commit()
+        return scholarship
+
+    def delete_scholarship(self, scholarship_id: int):
+        scholarship = self.get_scholarship(scholarship_id)
+        if not scholarship:
+            raise ValueError("奖学金记录不存在")
+        self.session.delete(scholarship)
         self.session.commit()

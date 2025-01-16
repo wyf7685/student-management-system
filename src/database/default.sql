@@ -213,3 +213,21 @@ SELECT 1111, 105, 87, '2023-2024-1'
 WHERE NOT EXISTS (
     SELECT 1 FROM grade WHERE student_id = 1111 AND course_id = 105 AND term = '2023-2024-1'
 );
+-- 插入奖学金信息
+INSERT INTO scholarship (scholarship_id, scholarship_name, student_id, amount, date_awarded, description)
+SELECT 1, '国家奖学金', 1111, 5000, '2023-10-15', '国家奖学金，金额5000元'
+WHERE NOT EXISTS (
+    SELECT 1 FROM scholarship WHERE scholarship_id = 1
+);
+
+INSERT INTO scholarship (scholarship_id, scholarship_name, student_id, amount, date_awarded, description)
+SELECT 2, '优秀学生奖学金', 1111, 3000, '2023-06-30', '优秀学生奖学金，金额3000元'
+WHERE NOT EXISTS (
+    SELECT 1 FROM scholarship WHERE scholarship_id = 2
+);
+
+INSERT INTO scholarship (scholarship_id, scholarship_name, student_id, amount, date_awarded, description)
+SELECT 3, '科研奖学金', 1111, 2000, '2023-05-15', '科研奖学金，金额2000元'
+WHERE NOT EXISTS (
+    SELECT 1 FROM scholarship WHERE scholarship_id = 3
+);
