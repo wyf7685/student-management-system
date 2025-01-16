@@ -80,3 +80,21 @@ WHERE NOT EXISTS (
     SELECT 1 FROM system_account 
     WHERE role = 'Admin' AND admin_id = 'admin'
 );
+-- 插入奖项信息
+INSERT INTO award (award_id, student_id, award_name, award_date)
+SELECT 1, 1111, '全国大学生程序设计竞赛一等奖', '2023-10-01'
+WHERE NOT EXISTS (
+    SELECT 1 FROM award WHERE award_id = 1
+);
+
+INSERT INTO award (award_id, student_id, award_name, award_date)
+SELECT 2, 1111, '优秀毕业生', '2023-06-30'
+WHERE NOT EXISTS (
+    SELECT 1 FROM award WHERE award_id = 2
+);
+
+INSERT INTO award (award_id, student_id, award_name, award_date)
+SELECT 3, 1111, '学术论文发表奖', '2023-05-15'
+WHERE NOT EXISTS (
+    SELECT 1 FROM award WHERE award_id = 3
+);

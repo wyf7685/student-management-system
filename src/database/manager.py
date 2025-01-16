@@ -4,7 +4,7 @@ import uuid
 from typing import Literal
 
 from .db_config import get_session, get_token
-from .models import Class, College, Course, Grade, Major, Student, SystemAccount
+from .models import Class, College, Course, Grade, Major, Student, SystemAccount, Award
 
 
 class DBManager:
@@ -408,4 +408,53 @@ class GradeDBManager(DBManager):
         if not grade:
             raise ValueError("成绩记录不存在")
         self.session.delete(grade)
+        self.session.commit()
+
+
+class AwardDBManager(DBManager):
+    def get_award(self, award_id: int) -> Award | None:
+        return self.session.query(Award).get(award_id)
+
+    def get_all_awards(self):
+        return self.session.query(Award).all()
+
+    def get_awards_by_student(self, student_id: int):
+        return self.session.query(Award).filter_by(student_id=student_id).all()
+
+    def exists_award(self, award_id: int) -> bool:
+        return self.session.query(Award).filter_by(award_id=award_id).count() > 0
+
+    def add_award(self, award: Award):
+        if self.exists_award(award.award_id):
+            raise ValueError("奖项已存在")
+        self.session.add(award)
+        self.session.commit()
+
+    def update_award(
+        self,
+        award_id: int,
+        *,
+        student_id: int | None = None,
+        award_name: str | None = None,
+        award_date: datetime.date | None = None,
+    ):
+        award = self.get_award(award_id)
+        if not award:
+            raise ValueError("奖项不存在")
+
+        if student_id is not None:
+            award.student_id = student_id
+        if award_name is not None:
+            award.award_name = award_name
+        if award_date is not None:
+            award.award_date = award_date
+
+        self.session.commit()
+        return award
+
+    def delete_award(self, award_id: int):
+        award = self.get_award(award_id)
+        if not award:
+            raise ValueError("奖项不存在")
+        self.session.delete(award)
         self.session.commit()
