@@ -13,6 +13,10 @@ from PyQt6.QtWidgets import (
 )
 
 from database import DBManager
+from utils import check
+
+from .dialog.about import AboutWindow
+from .dialog.settings import SettingsWindow
 
 
 class LoginWindow(QMainWindow):
@@ -20,6 +24,8 @@ class LoginWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+
+        self.about_dialog = None
         self.init_ui()
 
     def init_ui(self):
@@ -60,6 +66,22 @@ class LoginWindow(QMainWindow):
         login_button = QPushButton("登录")
         login_button.clicked.connect(self.handle_login)
         main_layout.addWidget(login_button)
+
+        # 创建菜单栏
+        self.create_menu_bar()
+
+    def create_menu_bar(self) -> None:
+        self.menubar = check(self.menuBar())
+
+        # 文件菜单
+        file_menu = check(self.menubar.addMenu("文件"))
+        settings_action = check(file_menu.addAction("设置"))
+        settings_action.triggered.connect(lambda: SettingsWindow(self).exec())
+
+        # 帮助菜单
+        help_menu = check(self.menubar.addMenu("帮助"))
+        about_action = check(help_menu.addAction("关于"))
+        about_action.triggered.connect(lambda: AboutWindow(self).exec())
 
     def handle_login(self):
         role = self.role_combo.currentText()

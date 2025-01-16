@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import (
 )
 
 from ..user_window import BaseUserWindow
+from .pages import PAGES
 
 
 class StudentMainWindow(BaseUserWindow):
@@ -36,23 +37,22 @@ class StudentMainWindow(BaseUserWindow):
         self.stack = QStackedWidget()
         main_layout.addWidget(self.stack)
 
-        # 添加各功能页面
-        self.init_pages()
-
         # 创建底部按钮区域
         button_widget = QWidget()
         button_layout = QHBoxLayout(button_widget)
         button_layout.setSpacing(10)
+        self.button_layout = button_layout
+        main_layout.addWidget(button_widget)
 
-        # 定义按钮列表
-        buttons = [
-            ("个人信息", 0),
-            ("课表查询", 1),
-            ("考试查询", 2),
-            ("成绩查询", 3),
-            ("奖项查询", 4),
-        ]
+        # 添加各功能页面
+        self.init_pages()
 
+        # 创建状态栏
+        status_bar = QStatusBar()
+        self.setStatusBar(status_bar)
+        status_bar.showMessage(f"当前用户: {self.user_id}")
+
+    def init_pages(self):
         def slot(i):
             return lambda *_: self.switch_page(i)
 
@@ -70,42 +70,17 @@ class StudentMainWindow(BaseUserWindow):
                     background-color: #357abd;
                 }
             """)
-            button_layout.addWidget(btn)
+            self.button_layout.addWidget(btn)
             return btn
 
-        # 创建按钮
-        for text, page_index in buttons:
-            btn(text).clicked.connect(slot(page_index))
+        for idx, page in enumerate(PAGES):
+            p = page(self)
+            btn(p.button_name).clicked.connect(slot(idx))
+            self.stack.addWidget(p)
 
         btn("退出登录").clicked.connect(self.handle_logout)
 
-        main_layout.addWidget(button_widget)
-
-        # 创建状态栏
-        status_bar = QStatusBar()
-        self.setStatusBar(status_bar)
-        status_bar.showMessage(f"当前用户: {self.user_id}")
-
-    def init_pages(self):
-        # 个人信息页面
-        personal_page = QWidget()
-        self.stack.addWidget(personal_page)
-
-        # 课表查询页面
-        schedule_page = QWidget()
-        self.stack.addWidget(schedule_page)
-
-        # 考试查询页面
-        exam_page = QWidget()
-        self.stack.addWidget(exam_page)
-
-        # 成绩查询页面
-        grade_page = QWidget()
-        self.stack.addWidget(grade_page)
-
-        # 奖项查询页面
-        award_page = QWidget()
-        self.stack.addWidget(award_page)
+        self.switch_page(0)
 
     def switch_page(self, index):
         self.stack.setCurrentIndex(index)
