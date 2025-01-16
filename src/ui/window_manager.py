@@ -13,7 +13,7 @@ class WindowManager(QObject):
             self.current_window.close()
 
         self.login_window = LoginWindow()
-        self.login_window.switch_window.connect(self.show_main_window)
+        self.login_window.switch_window = self.show_main_window  # wtf
         self.login_window.show()
         self.current_window = self.login_window
 
@@ -25,10 +25,12 @@ class WindowManager(QObject):
             from .student.window import StudentMainWindow
 
             self.main_window = StudentMainWindow(user_id)
+
         elif role == "Admin":
             from .admin.window import AdminMainWindow
 
             self.main_window = AdminMainWindow(user_id)
+
         elif role == "Teacher":
             from .teacher.window import TeacherMainWindow
 
