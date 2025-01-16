@@ -48,6 +48,9 @@ class DBManager:
     @classmethod
     def grade(cls):
         return GradeDBManager()
+    @classmethod
+    def award(cls):
+        return AwardDBManager()
 
 
 class CollegeDBManager(DBManager):
