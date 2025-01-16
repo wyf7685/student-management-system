@@ -1,4 +1,4 @@
-from ..page import BasePage
+from ui.common.page import BasePage
 
 
 class AwardPage(BasePage):

@@ -1,4 +1,5 @@
-from ..page import BasePage
+from ui.common.page import BasePage
+
 from .award import AwardPage
 from .course import CoursePage
 from .exam import ExamPage

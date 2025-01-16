@@ -1,11 +1,11 @@
 from database import DBManager, Major
+from database.manager import MajorDBManager
 
-from ._base import BaseController, DBRollbackMixin, check_college_id, check_major_id
+from ._base import BaseController, check_college_id, check_major_id
 
 
-class MajorController(DBRollbackMixin, BaseController):
-    def __init__(self) -> None:
-        super().__init__()
+class MajorController(BaseController[MajorDBManager]):
+    def init_db(self) -> None:
         self.db = DBManager.major()
 
     def add(self, major_id: str, name: str, college_id: str) -> bool:

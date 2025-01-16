@@ -10,40 +10,27 @@ from PyQt6.QtWidgets import (
     QSizePolicy,
     QTableWidget,
     QTableWidgetItem,
-    QTabWidget,
     QVBoxLayout,
     QWidget,
 )
 
-from ..common import BaseContextMenuHandler
-from ..controllers._base import BaseController
+from ui.common.page import BasePage as _BasePage
+
+from .common import BaseContextMenuHandler
+from .controllers._base import BaseController
 
 
-class BaseTab[C: BaseController](QWidget):
-    tab_name: ClassVar[str]
+class BasePage[C: BaseController](_BasePage):
     handler_cls: ClassVar[type[BaseContextMenuHandler]]
     columns: ClassVar[tuple[str, ...]]
     controller_cls: ClassVar[type[BaseController]]
 
-    controller: C
-
-    def __init__(self, parent: QWidget):
-        super().__init__(parent)
-        self._layout = QVBoxLayout()
-        self.setLayout(self._layout)
-        self.controller = cast(C, self.controller_cls())
-
-    def put_into(self, tab_widget: QTabWidget) -> None:
-        tab_widget.addTab(self, self.tab_name)
-        self.setup_ui()
-
-    def get_layout(self) -> QVBoxLayout:
-        return self._layout
-
     def on_error(self, message: str) -> None:
         QMessageBox.warning(self, "错误", message)
 
-    def setup_ui(self) -> None:
+    def init_ui(self) -> None:
+        self.controller = cast(C, self.controller_cls(self))
+
         self.controller.added.connect(self.update_table)
         self.controller.deleted.connect(self.update_table)
         self.controller.updated.connect(self.update_table)
@@ -52,7 +39,7 @@ class BaseTab[C: BaseController](QWidget):
         widget = QWidget()
         layout = QVBoxLayout(widget)
         title_layout = QHBoxLayout()
-        title_label = QLabel(f"{self.tab_name}列表")
+        title_label = QLabel(f"{self.button_name}列表")
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title_label.setStyleSheet(
             "font-size: 14px; font-weight: bold; margin-bottom: 10px;"
@@ -69,7 +56,9 @@ class BaseTab[C: BaseController](QWidget):
         self.setup_table()
         layout.addWidget(self.table)
 
-        self.get_layout().addWidget(widget)
+        self._layout = QVBoxLayout()
+        self._layout.addWidget(widget)
+        self.setLayout(self._layout)
 
     def setup_table(self):
         table = QTableWidget()
@@ -85,9 +74,6 @@ class BaseTab[C: BaseController](QWidget):
         self.table = table
         self.update_table()
 
-    def iterate_table_data(self) -> Generator[tuple[object, ...]]:
-        yield NotImplemented
-
     def update_table(self) -> None:
         self.table.setRowCount(0)
         for data in self.iterate_table_data():
@@ -96,3 +82,6 @@ class BaseTab[C: BaseController](QWidget):
 
             for col, value in enumerate(data):
                 self.table.setItem(row, col, QTableWidgetItem(str(value)))
+
+    def iterate_table_data(self) -> Generator[tuple[object, ...]]:
+        yield NotImplemented

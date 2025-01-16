@@ -1,4 +1,3 @@
-import weakref
 from typing import TYPE_CHECKING, Protocol, cast
 
 from PyQt6.QtCore import QPoint
@@ -19,20 +18,6 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from PyQt6.QtGui import QAction
-
-    from .window import AdminMainWindow
-
-
-__admin_main_ref: "weakref.ref[AdminMainWindow] | None" = None
-
-
-def setup_admin_main(main_window: "AdminMainWindow | None") -> None:
-    global __admin_main_ref
-    __admin_main_ref = weakref.ref(main_window) if main_window else None
-
-
-def get_admin_main() -> "AdminMainWindow":
-    return check(__admin_main_ref and __admin_main_ref())
 
 
 class _ContextMenuHandlerParentTab[C](Protocol):

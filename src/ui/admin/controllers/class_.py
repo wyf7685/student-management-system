@@ -1,8 +1,8 @@
-from database import Class, DBManager
+from database import Class
+from database.manager import ClassDBManager
 
 from ._base import (
     BaseController,
-    DBRollbackMixin,
     check_class_id,
     check_major_id,
     make_checker,
@@ -11,10 +11,8 @@ from ._base import (
 check_year = make_checker("年级")
 
 
-class ClassController(DBRollbackMixin, BaseController):
-    def __init__(self) -> None:
-        super().__init__()
-        self.db = DBManager.class_()
+class ClassController(BaseController[ClassDBManager]):
+    dbm_factory = ClassDBManager
 
     def add(
         self,

@@ -1,6 +1,6 @@
 from PyQt6.QtCore import pyqtSignal
 
-from ..user_window import BaseUserWindow
+from ui.common.user_window import BaseUserWindow
 
 
 class TeacherMainWindow(BaseUserWindow):

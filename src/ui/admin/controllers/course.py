@@ -14,8 +14,7 @@ def check_credits(course_id: str) -> int:
 
 
 class CourseController(BaseController):
-    def __init__(self):
-        super().__init__()
+    def init_db(self) -> None:
         self.manager = DBManager.course()
 
     def get_all(self):
