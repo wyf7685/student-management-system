@@ -16,6 +16,7 @@ from .models import (
     Student,
     StudentClub,
     SystemAccount,
+    Teacher,
 )
 
 
@@ -32,6 +33,9 @@ class DBManager:
 
     def rollback(self):
         self.session.rollback()
+
+    def __del__(self):
+        self._session.close()
 
     @classmethod
     def college(cls):
@@ -64,6 +68,7 @@ class DBManager:
     @classmethod
     def award(cls):
         return AwardDBManager()
+
     @classmethod
     def exam(cls):
         return ExamDBManager()
@@ -75,6 +80,10 @@ class DBManager:
     @classmethod
     def student_club(cls):
         return StudentClubDBManager()
+
+    @classmethod
+    def teacher(cls):
+        return TeacherDBManager()
 
 
 class CollegeDBManager(DBManager):
@@ -396,6 +405,12 @@ class GradeDBManager(DBManager):
     def get_all_grades(self):
         return self.session.query(Grade).all()
 
+    def find_grade_by_student(self, student_id: int) -> list[Grade]:
+        return self.session.query(Grade).filter_by(student_id=student_id).all()
+
+    def find_grade_by_course(self, course_id: int) -> list[Grade]:
+        return self.session.query(Grade).filter_by(course_id=course_id).all()
+
     def exists_grade(self, student_id: int, course_id: int) -> bool:
         return (
             self.session.query(Grade)
@@ -485,6 +500,8 @@ class AwardDBManager(DBManager):
             raise ValueError("奖项不存在")
         self.session.delete(award)
         self.session.commit()
+
+
 class ExamDBManager(DBManager):
     def get_exam(self, exam_id: int) -> Exam | None:
         return self.session.query(Exam).get(exam_id)
@@ -537,6 +554,7 @@ class ExamDBManager(DBManager):
         if not exam:
             raise ValueError("考试记录不存在")
         self.session.delete(exam)
+        self.session.commit()
 
 
 class ClubDBManager(DBManager):
@@ -623,4 +641,56 @@ class StudentClubDBManager(DBManager):
         if not student_club:
             raise ValueError("学生社团关系不存在")
         self.session.delete(student_club)
+        self.session.commit()
+
+
+class TeacherDBManager(DBManager):
+    def get_teacher(self, teacher_id: int) -> Teacher | None:
+        return self.session.query(Teacher).get(teacher_id)
+
+    def get_all_teachers(self):
+        return self.session.query(Teacher).all()
+
+    def exists_teacher(self, teacher_id: int) -> bool:
+        return self.session.query(Teacher).filter_by(teacher_id=teacher_id).count() > 0
+
+    def add_teacher(self, teacher: Teacher):
+        if self.exists_teacher(teacher.teacher_id):
+            raise ValueError("教师已存在")
+        self.session.add(teacher)
+        self.session.commit()
+
+    def update_teacher(
+        self,
+        teacher_id: int,
+        *,
+        name: str | None = None,
+        gender: Literal["F", "M"] | None = None,
+        birth: datetime.datetime | None = None,
+        phone: str | None = None,
+        email: str | None = None,
+    ):
+        teacher = self.get_teacher(teacher_id)
+        if not teacher:
+            raise ValueError("教师不存在")
+
+        if name is not None:
+            teacher.name = name
+        if gender is not None:
+            teacher.gender = gender
+        if birth is not None:
+            teacher.birth = birth
+        if phone is not None:
+            teacher.phone = phone
+        if email is not None:
+            teacher.email = email
+
+        self.session.commit()
+        return teacher
+
+    def delete_teacher(self, teacher_id: int):
+        teacher = self.get_teacher(teacher_id)
+        if not teacher:
+            raise ValueError("教师不存在")
+        self.session.delete(teacher)
         self.session.commit()

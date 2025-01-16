@@ -1,4 +1,5 @@
 from ..page import BasePage
+from .account import AccountPage
 from .class_ import ClassPage
 from .college import CollegePage
 from .course import CoursePage
@@ -11,4 +12,5 @@ PAGES: tuple[type[BasePage], ...] = (
     ClassPage,
     StudentPage,
     CoursePage,
+    AccountPage,
 )
