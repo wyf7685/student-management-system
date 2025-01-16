@@ -1,16 +1,16 @@
 # award.py
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
     QLabel,
     QLineEdit,
-    QPushButton,
-    QVBoxLayout,
     QListWidget,
     QListWidgetItem,
+    QPushButton,
+    QVBoxLayout,
 )
 
-from PyQt6.QtCore import Qt
 from database.manager import DBManager
 from ui.common.page import BasePage
 
