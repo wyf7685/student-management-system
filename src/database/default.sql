@@ -128,3 +128,28 @@ SELECT 105, '计算机网络', 3
 WHERE NOT EXISTS (
     SELECT 1 FROM course WHERE course_id = 105
 );
+
+INSERT INTO club (club_id, name, description)
+SELECT 1, '读书社', '一个热爱阅读的社团，定期组织读书分享会'
+WHERE NOT EXISTS (
+    SELECT 1 FROM club WHERE club_id = 1
+);
+
+INSERT INTO club (club_id, name, description)
+SELECT 2, '编程社', '专注于计算机编程技术的学习与交流'
+WHERE NOT EXISTS (
+    SELECT 1 FROM club WHERE club_id = 2
+);
+
+INSERT INTO club (club_id, name, description)
+SELECT 3, '摄影社', '记录校园生活，培养摄影技术与艺术审美'
+WHERE NOT EXISTS (
+    SELECT 1 FROM club WHERE club_id = 3
+);
+
+INSERT INTO student_club (student_id, club_id, role)
+SELECT 1111, 2, 'member'
+WHERE NOT EXISTS (
+    SELECT 1 FROM student_club 
+    WHERE student_id = 1111 AND club_id = 2
+);
