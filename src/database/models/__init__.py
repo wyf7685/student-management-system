@@ -4,6 +4,7 @@ from .club import Club as Club
 from .college import College as College
 from .course import Course as Course
 from .course_enrollment import CourseEnrollment as CourseEnrollment
+from .course_enrollment import EnrollmentsStatusCode as EnrollmentsStatusCode
 from .course_teacher import CourseTeacher as CourseTeacher
 from .exam import Exam as Exam
 from .grade import Grade as Grade

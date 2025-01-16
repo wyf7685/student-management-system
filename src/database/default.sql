@@ -231,3 +231,24 @@ SELECT 3, '科研奖学金', 1111, 2000, '2023-05-15', '科研奖学金，金额
 WHERE NOT EXISTS (
     SELECT 1 FROM scholarship WHERE scholarship_id = 3
 );
+
+INSERT INTO course_enrollment (student_id, course_id, semester, course_status)
+SELECT 1111, 101, '2023-2024-1', 1
+WHERE NOT EXISTS (
+    SELECT 1 FROM course_enrollment 
+    WHERE student_id = 1111 AND course_id = 101
+);
+
+INSERT INTO course_enrollment (student_id, course_id, semester, course_status)
+SELECT 1111, 102, '2023-2024-1', 1
+WHERE NOT EXISTS (
+    SELECT 1 FROM course_enrollment 
+    WHERE student_id = 1111 AND course_id = 102
+);
+
+INSERT INTO course_enrollment (student_id, course_id, semester, course_status)
+SELECT 1111, 103, '2023-2024-1', 1
+WHERE NOT EXISTS (
+    SELECT 1 FROM course_enrollment 
+    WHERE student_id = 1111 AND course_id = 103
+);

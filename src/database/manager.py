@@ -10,6 +10,9 @@ from .models import (
     Club,
     College,
     Course,
+    CourseEnrollment,
+    CourseTeacher,
+    EnrollmentsStatusCode,
     Exam,
     Grade,
     Major,
@@ -81,6 +84,7 @@ class DBManager:
     @classmethod
     def student_club(cls):
         return StudentClubDBManager()
+
     @classmethod
     def scholarship(cls):
         return ScholarshipDBManager()
@@ -88,6 +92,10 @@ class DBManager:
     @classmethod
     def teacher(cls):
         return TeacherDBManager()
+
+    @classmethod
+    def course_teacher(cls):
+        return CourseTeacherDBManager()
 
 
 class CollegeDBManager(DBManager):
@@ -118,6 +126,10 @@ class CollegeDBManager(DBManager):
             raise ValueError("学院不存在")
         self.session.delete(college)
         self.session.commit()
+
+    @classmethod
+    def course_enrollment(cls):
+        return CourseEnrollmentDBManager()
 
 
 class MajorDBManager(DBManager):
@@ -510,6 +522,15 @@ class ExamDBManager(DBManager):
     def get_exam(self, exam_id: int) -> Exam | None:
         return self.session.query(Exam).get(exam_id)
 
+    def get_exam_by_student_id(self, student_id: int) -> list[Exam]:
+        return (
+            self.session.query(Exam)
+            .join(Course, Exam.course_id == Course.course_id)
+            .join(CourseEnrollment, Course.course_id == CourseEnrollment.course_id)
+            .filter(CourseEnrollment.student_id == student_id)
+            .all()
+        )
+
     def get_all_exams(self):
         return self.session.query(Exam).all()
 
@@ -646,6 +667,8 @@ class StudentClubDBManager(DBManager):
             raise ValueError("学生社团关系不存在")
         self.session.delete(student_club)
         self.session.commit()
+
+
 class ScholarshipDBManager(DBManager):
     def get_scholarship(self, scholarship_id: int) -> Scholarship | None:
         return self.session.query(Scholarship).get(scholarship_id)
@@ -703,6 +726,7 @@ class ScholarshipDBManager(DBManager):
         if not scholarship:
             raise ValueError("奖学金记录不存在")
         self.session.delete(scholarship)
+        self.session.commit()
 
 
 class TeacherDBManager(DBManager):
@@ -754,4 +778,138 @@ class TeacherDBManager(DBManager):
         if not teacher:
             raise ValueError("教师不存在")
         self.session.delete(teacher)
+        self.session.commit()
+
+
+class CourseTeacherDBManager(DBManager):
+    def get_course_teacher(
+        self, course_id: int, teacher_id: int
+    ) -> CourseTeacher | None:
+        return (
+            self.session.query(CourseTeacher)
+            .filter_by(course_id=course_id, tearcher_id=teacher_id)
+            .first()
+        )
+
+    def get_all_course_teachers(self):
+        return self.session.query(CourseTeacher).all()
+
+    def get_courses_by_teacher(self, teacher_id: int):
+        return self.session.query(CourseTeacher).filter_by(tearcher_id=teacher_id).all()
+
+    def get_teachers_by_course(self, course_id: int):
+        return self.session.query(CourseTeacher).filter_by(course_id=course_id).all()
+
+    def get_by_semester(self, semester: str):
+        return self.session.query(CourseTeacher).filter_by(semester=semester).all()
+
+    def exists_course_teacher(self, course_id: int, teacher_id: int) -> bool:
+        return (
+            self.session.query(CourseTeacher)
+            .filter_by(course_id=course_id, tearcher_id=teacher_id)
+            .count()
+            > 0
+        )
+
+    def add_course_teacher(self, course_teacher: CourseTeacher):
+        if self.exists_course_teacher(
+            course_teacher.course_id, course_teacher.tearcher_id
+        ):
+            raise ValueError("课程教师关系已存在")
+        self.session.add(course_teacher)
+        self.session.commit()
+
+    def update_course_teacher(
+        self,
+        course_id: int,
+        teacher_id: int,
+        *,
+        semester: str | None = None,
+    ):
+        course_teacher = self.get_course_teacher(course_id, teacher_id)
+        if not course_teacher:
+            raise ValueError("课程教师关系不存在")
+
+        if semester is not None:
+            course_teacher.semester = semester
+
+        self.session.commit()
+        return course_teacher
+
+    def delete_course_teacher(self, course_id: int, teacher_id: int):
+        course_teacher = self.get_course_teacher(course_id, teacher_id)
+        if not course_teacher:
+            raise ValueError("课程教师关系不存在")
+        self.session.delete(course_teacher)
+        self.session.commit()
+
+
+class CourseEnrollmentDBManager(DBManager):
+    def get_enrollment(
+        self, student_id: int, course_id: int
+    ) -> CourseEnrollment | None:
+        return (
+            self.session.query(CourseEnrollment)
+            .filter_by(student_id=student_id, course_id=course_id)
+            .first()
+        )
+
+    def get_all_enrollments(self):
+        return self.session.query(CourseEnrollment).all()
+
+    def get_student_enrollments(self, student_id: int):
+        return (
+            self.session.query(CourseEnrollment).filter_by(student_id=student_id).all()
+        )
+
+    def get_course_enrollments(self, course_id: int):
+        return self.session.query(CourseEnrollment).filter_by(course_id=course_id).all()
+
+    def get_by_semester(self, semester: str):
+        return self.session.query(CourseEnrollment).filter_by(semester=semester).all()
+
+    def get_by_status(self, status: EnrollmentsStatusCode):
+        return (
+            self.session.query(CourseEnrollment).filter_by(course_status=status).all()
+        )
+
+    def exists_enrollment(self, student_id: int, course_id: int) -> bool:
+        return (
+            self.session.query(CourseEnrollment)
+            .filter_by(student_id=student_id, course_id=course_id)
+            .count()
+            > 0
+        )
+
+    def add_enrollment(self, enrollment: CourseEnrollment):
+        if self.exists_enrollment(enrollment.student_id, enrollment.course_id):
+            raise ValueError("选课记录已存在")
+        self.session.add(enrollment)
+        self.session.commit()
+
+    def update_enrollment(
+        self,
+        student_id: int,
+        course_id: int,
+        *,
+        semester: str | None = None,
+        course_status: EnrollmentsStatusCode | None = None,
+    ):
+        enrollment = self.get_enrollment(student_id, course_id)
+        if not enrollment:
+            raise ValueError("选课记录不存在")
+
+        if semester is not None:
+            enrollment.semester = semester
+        if course_status is not None:
+            enrollment.course_status = course_status
+
+        self.session.commit()
+        return enrollment
+
+    def delete_enrollment(self, student_id: int, course_id: int):
+        enrollment = self.get_enrollment(student_id, course_id)
+        if not enrollment:
+            raise ValueError("选课记录不存在")
+        self.session.delete(enrollment)
         self.session.commit()
