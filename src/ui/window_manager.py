@@ -1,5 +1,4 @@
 from PyQt6.QtCore import QObject
-from PyQt6.QtWidgets import QApplication
 
 
 class WindowManager(QObject):
@@ -38,10 +37,3 @@ class WindowManager(QObject):
         self.main_window.logout_signal.connect(self.show_login)
         self.main_window.show()
         self.current_window = self.main_window
-
-
-if __name__ == "__main__":
-    app = QApplication([])
-    window_manager = WindowManager()
-    window_manager.show_login()
-    app.exec()

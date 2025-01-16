@@ -1,12 +1,11 @@
-from database import DBManager, Major
+from database import Major
 from database.manager import MajorDBManager
 
 from ._base import BaseController, check_college_id, check_major_id
 
 
 class MajorController(BaseController[MajorDBManager]):
-    def init_db(self) -> None:
-        self.db = DBManager.major()
+    dbm_factory = MajorDBManager
 
     def add(self, major_id: str, name: str, college_id: str) -> bool:
         try:

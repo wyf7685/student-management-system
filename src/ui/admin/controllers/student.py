@@ -3,15 +3,14 @@
 from datetime import datetime
 from typing import Literal
 
-from database import DBManager, Student
+from database import Student
 from database.manager import StudentDBManager
 
 from ._base import BaseController, check_student_id
 
 
 class StudentController(BaseController[StudentDBManager]):
-    def init_db(self) -> None:
-        self.db = DBManager.student()
+    dbm_factory = StudentDBManager
 
     def add(
         self,

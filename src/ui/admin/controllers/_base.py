@@ -22,8 +22,7 @@ class BaseController[D: DBManager](QObject):
     def __init__(self, parent: "BasePage") -> None:
         super().__init__(parent)
         self.db = self.dbm_factory()
-        for sig in self.added, self.updated, self.deleted, self.operation_error:
-            sig.connect(self.status_update.emit)
+        self.operation_error.connect(parent.status_update.emit)
         self.status_update.connect(parent.status_update.emit)
 
     def error(self, error: str):
