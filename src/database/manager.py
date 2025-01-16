@@ -493,6 +493,14 @@ class ClubDBManager(DBManager):
     def exists_club(self, club_id: int) -> bool:
         return self.session.query(Club).filter_by(club_id=club_id).count() > 0
 
+    def search_club(self, keyword: str):
+        like = f"%{keyword}%"
+        return (
+            self.session.query(Club)
+            .filter((Club.name.like(like)) | (Club.description.like(like)))
+            .all()
+        )
+
     def add_club(self, club: Club):
         if self.exists_club(club.club_id):
             raise ValueError("社团已存在")
@@ -547,10 +555,10 @@ class StudentClubDBManager(DBManager):
             > 0
         )
 
-    def add_student_club(self, student_id: int, club_id: int):
+    def add_student_club(self, student_id: int, club_id: int, role: str):
         if self.exists_student_club(student_id, club_id):
             raise ValueError("学生社团关系已存在")
-        student_club = StudentClub(student_id=student_id, club_id=club_id)
+        student_club = StudentClub(student_id=student_id, club_id=club_id, role=role)
         self.session.add(student_club)
         self.session.commit()
 
