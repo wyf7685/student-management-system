@@ -86,3 +86,23 @@ def create_all():
                 )
             )
             session.commit()
+    with get_session() as session:
+        if not session.query(SystemAccount).filter_by(username="stu").count():
+            session.add(
+                SystemAccount(
+                    role="Student",
+                    username="stu",
+                    password=hashlib.sha256(b"stu").hexdigest(),
+                )
+            )
+            session.commit()
+    with get_session() as session:
+        if not session.query(SystemAccount).filter_by(username="teacher").count():
+            session.add(
+                SystemAccount(
+                    role="Teacher",
+                    username="teacher",
+                    password=hashlib.sha256(b"teacher").hexdigest(),
+                )
+            )
+            session.commit()
