@@ -102,6 +102,8 @@ class LoginWindow(QMainWindow):
         file_menu = check(self.menubar.addMenu("文件"))
         settings_action = check(file_menu.addAction("设置"))
         settings_action.triggered.connect(lambda: SettingsDialog(self).exec())
+        exit_action = check(file_menu.addAction("退出"))
+        exit_action.triggered.connect(self.close)
 
         # 帮助菜单
         help_menu = check(self.menubar.addMenu("帮助"))
