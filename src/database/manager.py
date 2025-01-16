@@ -64,6 +64,7 @@ class DBManager:
     @classmethod
     def award(cls):
         return AwardDBManager()
+
     @classmethod
     def exam(cls):
         return ExamDBManager()
@@ -396,6 +397,12 @@ class GradeDBManager(DBManager):
     def get_all_grades(self):
         return self.session.query(Grade).all()
 
+    def find_grade_by_student(self, student_id: int) -> list[Grade]:
+        return self.session.query(Grade).filter_by(student_id=student_id).all()
+
+    def find_grade_by_course(self, course_id: int) -> list[Grade]:
+        return self.session.query(Grade).filter_by(course_id=course_id).all()
+
     def exists_grade(self, student_id: int, course_id: int) -> bool:
         return (
             self.session.query(Grade)
@@ -485,6 +492,8 @@ class AwardDBManager(DBManager):
             raise ValueError("奖项不存在")
         self.session.delete(award)
         self.session.commit()
+
+
 class ExamDBManager(DBManager):
     def get_exam(self, exam_id: int) -> Exam | None:
         return self.session.query(Exam).get(exam_id)
