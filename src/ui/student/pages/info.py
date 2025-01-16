@@ -5,10 +5,10 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QMessageBox,
     QPushButton,
-    QSpacerItem,
     QVBoxLayout,
 )
 
+from const import BUTTON_STYLESHEET
 from database import DBManager
 from ui.common.page import BasePage
 from utils import check
@@ -55,23 +55,13 @@ class InfoPage(BasePage):
         self.phone_edit.textChanged.connect(self.on_line_edit_updated)
         self.email_edit.textChanged.connect(self.on_line_edit_updated)
 
-        central_layout = QVBoxLayout()
-        central_layout.addWidget(group_box)
+        layout = QVBoxLayout()
+        layout.addWidget(group_box)
 
         def btn(text: str):
             btn = QPushButton(text)
             btn.setMinimumWidth(100)
-            btn.setStyleSheet("""
-                QPushButton {
-                    padding: 8px;
-                    background-color: #4a90e2;
-                    color: white;
-                    border-radius: 4px;
-                }
-                QPushButton:hover {
-                    background-color: #357abd;
-                }
-            """)
+            btn.setStyleSheet(BUTTON_STYLESHEET)
             button_layout.addWidget(btn)
             return btn
 
@@ -81,13 +71,8 @@ class InfoPage(BasePage):
         self.confirm_btn.clicked.connect(self.on_confirm_modify)
         self.cancel_btn = btn("取消修改")
         self.cancel_btn.clicked.connect(self.load_student_info)
-        central_layout.addLayout(button_layout)
+        layout.addLayout(button_layout)
 
-        layout = QHBoxLayout()
-        spacer = QSpacerItem(90, 20)
-        layout.addSpacerItem(spacer)
-        layout.addLayout(central_layout)
-        layout.addSpacerItem(spacer)
         self.setLayout(layout)
 
         # 初始化学生信息

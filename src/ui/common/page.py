@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, ClassVar
 
 from PyQt6.QtCore import pyqtSignal
-from PyQt6.QtWidgets import QWidget
+from PyQt6.QtWidgets import QMessageBox, QWidget
 
 if TYPE_CHECKING:
     from .user_window import BaseUserWindow
@@ -21,6 +21,10 @@ class BasePage(QWidget):
 
     def update_status(self, status: str) -> None:
         self._parent.status_update.emit(status)
+
+    def on_error(self, message: str) -> None:
+        self.update_status(f"错误: {message}")
+        QMessageBox.warning(self, "错误", message)
 
     def init_ui(self) -> None:
         raise NotImplementedError

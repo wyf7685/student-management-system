@@ -14,6 +14,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from const import BUTTON_STYLESHEET
 from utils import check
 
 from ..dialog.about import AboutDialog
@@ -107,6 +108,9 @@ class BaseUserWindow(QMainWindow):
         self.setStatusBar(status_bar)
         status_bar.showMessage(f"当前用户: {self.user_id}")
 
+    def add_stack_widget(self, widget: QWidget):
+        self.stack.addWidget(widget)
+
     def init_pages(self):
         def slot(i):
             return lambda *_: self.switch_page(i)
@@ -114,24 +118,14 @@ class BaseUserWindow(QMainWindow):
         def btn(text: str):
             btn = QPushButton(text)
             btn.setMinimumWidth(100)
-            btn.setStyleSheet("""
-                QPushButton {
-                    padding: 8px;
-                    background-color: #4a90e2;
-                    color: white;
-                    border-radius: 4px;
-                }
-                QPushButton:hover {
-                    background-color: #357abd;
-                }
-            """)
+            btn.setStyleSheet(BUTTON_STYLESHEET)
             self.button_layout.addWidget(btn)
             return btn
 
         for idx, page in enumerate(self.page_cls):
             p = page(self)
             btn(p.button_name).clicked.connect(slot(idx))
-            self.stack.addWidget(p)
+            self.add_stack_widget(p)
 
         btn("退出登录").clicked.connect(self.handle_logout)
 
