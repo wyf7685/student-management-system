@@ -8,7 +8,7 @@ from const import CONFIG_FILE
 
 class SqliteConfig(BaseModel):
     type: Literal["SQLite"] = "SQLite"
-    path: Path
+    path: Path = Path("db.sqlite")
 
 
 class ServerConfig(BaseModel):
@@ -19,9 +19,13 @@ class ServerConfig(BaseModel):
     password: str
     database: str
 
+class LastLogin(BaseModel):
+    role: Literal["Admin", "Teacher", "Student"]
+    username: str
 
 class Config(BaseModel):
-    db: SqliteConfig | ServerConfig = SqliteConfig(path=Path("db.sqlite"))
+    db: SqliteConfig | ServerConfig = SqliteConfig()
+    last_login: LastLogin | None = None
 
     def save(self):
         CONFIG_FILE.parent.mkdir(parents=True, exist_ok=True)
