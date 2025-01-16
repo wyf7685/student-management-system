@@ -1,8 +1,8 @@
 from ui.common.page import BasePage
 
 
-class ExamPage(BasePage):
-    button_name = "考试信息"
+class ScholarshipPage(BasePage):
+    button_name = "奖学金信息"
 
     def init_ui(self):
         pass

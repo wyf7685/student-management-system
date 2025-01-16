@@ -5,7 +5,6 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
-    QMessageBox,
     QPushButton,
     QSizePolicy,
     QTableWidget,
@@ -24,9 +23,6 @@ class BasePage[C: BaseController](_BasePage):
     handler_cls: ClassVar[type[BaseContextMenuHandler]]
     columns: ClassVar[tuple[str, ...]]
     controller_cls: ClassVar[type[BaseController]]
-
-    def on_error(self, message: str) -> None:
-        QMessageBox.warning(self, "错误", message)
 
     def init_ui(self) -> None:
         self.controller = cast(C, self.controller_cls(self))
