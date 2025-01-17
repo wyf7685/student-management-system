@@ -70,10 +70,7 @@ def _create_server_engine(config: ServerConfig) -> Engine:
         return _create_sql_server_engine(config)
 
     url = URL(
-        drivername={
-            "MySQL": "mysql+mysqlclient",
-            "PostgreSQL": "postgresql+psycopg2",
-        }[config.type],
+        drivername=config.type.lower(),
         username=config.username,
         password=config.password,
         host=config.host,

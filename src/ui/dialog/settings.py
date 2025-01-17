@@ -105,7 +105,6 @@ class SettingsDialog(QDialog):
 
     def on_db_type_changed(self, db_type):
         """处理数据库类型变更"""
-
         if db_type == "SQLite":
             self.sqlite_path.setText("db.sqlite")
         else:
@@ -117,8 +116,8 @@ class SettingsDialog(QDialog):
             }[db_type]
             self.port_edit.setText(default_port)
 
-        self.switch_sqlite_visible(visible=db_type == "SQLite")
         self.load_settings()
+        self.switch_sqlite_visible(visible=db_type == "SQLite")
 
     def browse_sqlite_file(self):
         """选择SQLite数据库文件"""
