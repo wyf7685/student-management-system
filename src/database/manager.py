@@ -298,6 +298,14 @@ class CourseDBManager(DBManager):
     def get_all_courses(self):
         return self.session.query(Course).all()
 
+    def get_courses_by_teacher(self, teacher_id: int):
+        return (
+            self.session.query(Course)
+            .join(CourseTeacher, Course.course_id == CourseTeacher.course_id)
+            .filter(CourseTeacher.tearcher_id == teacher_id)
+            .all()
+        )
+
     def exists_course(self, course_id: int):
         return self.session.query(Course).filter_by(course_id=course_id).count() > 0
 
@@ -439,9 +447,15 @@ class GradeDBManager(DBManager):
             > 0
         )
 
-    def add_grade(self, grade: Grade):
-        if self.exists_grade(grade.student_id, grade.course_id):
+    def add_grade(self, student_id: int, course_id: int, score: int, term: str):
+        if self.exists_grade(student_id, course_id):
             raise ValueError("成绩记录已存在")
+        grade = Grade(
+            student_id=student_id,
+            course_id=course_id,
+            score=score,
+            term=term,
+        )
         self.session.add(grade)
         self.session.commit()
 
@@ -876,6 +890,33 @@ class CourseEnrollmentDBManager(DBManager):
         return (
             self.session.query(CourseEnrollment).filter_by(course_status=status).all()
         )
+
+    def get_detail(self, enrollment: CourseEnrollment):
+        data = (
+            self.session.query(
+                CourseEnrollment.student_id,
+                Student.name,
+                CourseEnrollment.course_id,
+                Course.name,
+            )
+            .join(Student, Student.student_id == CourseEnrollment.student_id)
+            .join(Course, Course.course_id == CourseEnrollment.course_id)
+            .filter(CourseEnrollment.student_id == enrollment.student_id)
+            .filter(CourseEnrollment.course_id == enrollment.course_id)
+            .first()
+        )
+        if data is None:
+            return data
+
+        score = (
+            self.session.query(Grade.score)
+            .filter_by(
+                student_id=enrollment.student_id,
+                course_id=enrollment.course_id,
+            )
+            .first()
+        )
+        return (*data.t, score.t[0] if score else None)
 
     def exists_enrollment(self, student_id: int, course_id: int) -> bool:
         return (

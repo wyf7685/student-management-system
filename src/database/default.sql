@@ -252,3 +252,24 @@ WHERE NOT EXISTS (
     SELECT 1 FROM course_enrollment 
     WHERE student_id = 1111 AND course_id = 103
 );
+
+INSERT INTO course_teacher (tearcher_id, course_id, semester)
+SELECT 1001, 101, '2023-2024-1'
+WHERE NOT EXISTS (
+    SELECT 1 FROM course_teacher 
+    WHERE tearcher_id = 1001 AND course_id = 101
+);
+
+INSERT INTO course_teacher (tearcher_id, course_id, semester)
+SELECT 1001, 102, '2023-2024-1'
+WHERE NOT EXISTS (
+    SELECT 1 FROM course_teacher 
+    WHERE tearcher_id = 1001 AND course_id = 102
+);
+
+INSERT INTO course_teacher (tearcher_id, course_id, semester)
+SELECT 1001, 103, '2023-2024-1'
+WHERE NOT EXISTS (
+    SELECT 1 FROM course_teacher 
+    WHERE tearcher_id = 1001 AND course_id = 103
+);
