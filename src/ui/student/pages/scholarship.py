@@ -2,14 +2,14 @@ from functools import partial
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import (
+    QHeaderView,
     QLabel,
     QMessageBox,
     QPushButton,
+    QSizePolicy,
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
-    QHeaderView,
-    QSizePolicy,
 )
 
 from database.manager import DBManager

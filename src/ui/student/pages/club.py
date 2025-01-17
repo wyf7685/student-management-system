@@ -143,17 +143,20 @@ class ClubPage(BasePage):
         DBManager.student_club().delete_student_club(int(self.get_user_id()), club_id)
         self.update_clubs_table()
 
-    def update_enrollment_info(self, row: int, column: int):  
-    # 确保 clubs 列表是最新的
-     if not hasattr(self, "clubs") or not self.clubs:
-        self.update_clubs_table()
+    def update_enrollment_info(self, row: int, _: int):
+        # 确保 clubs 列表是最新的
+        if not hasattr(self, "clubs") or not self.clubs:
+            self.update_clubs_table()
 
-     cid = self.clubs[row]
-     status = "报名中..." if cid in self.joined else "未报名..."
-     # 从原始的 clubs 数据中查找描述信息
-     club_data = next((club for club in DBManager.club().get_all_clubs() if club.club_id == cid), None) 
-     description = club_data.description if club_data else "无描述信息"
+        cid = self.clubs[row]
+        status = "报名中..." if cid in self.joined else "未报名..."
+        # 从原始的 clubs 数据中查找描述信息
+        club_data = next(
+            (club for club in DBManager.club().get_all_clubs() if club.club_id == cid),
+            None,
+        )
+        description = club_data.description if club_data else "无描述信息"
 
-     self.enrollment_label.setText(
-        f"社团ID: {cid}\n状态: {status}\n描述: {description}"
-    )
+        self.enrollment_label.setText(
+            f"社团ID: {cid}\n状态: {status}\n描述: {description}"
+        )
