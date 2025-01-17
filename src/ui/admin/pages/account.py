@@ -98,10 +98,7 @@ class AddDialog(BaseConfirmDialog):
         self.admin_id_edit = QLineEdit()
         admin_layout.addWidget(self.admin_id_edit)
 
-        self.yes_btn.setDisabled(True)
-
     def on_role_changed(self, role: str):
-        self.yes_btn.setDisabled(False)
         self.student_id_widget.setVisible(False)
         self.teacher_id_widget.setVisible(False)
         self.admin_widget.setVisible(False)
