@@ -16,12 +16,3 @@ from .models import StudentClub as StudentClub
 from .models import StudentStatus as StudentStatus
 from .models import SystemAccount as SystemAccount
 from .models import Teacher as Teacher
-
-
-def __init():
-    from .db_config import create_all
-
-    create_all()
-
-
-__init()

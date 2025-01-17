@@ -2,71 +2,83 @@ from sqlalchemy import URL, Engine, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session, declared_attr, sessionmaker
 from sqlalchemy.util import immutabledict
 
-from config import config
+from config import config, SqliteConfig, ServerConfig
 
-__token = object()
+__token: object = None
 __engine: Engine | None = None
 __session_maker: sessionmaker | None = None
 
 
+def get_token() -> object:
+    return __token
+
+
+def _create_sqlite_engine(config: SqliteConfig) -> Engine:
+    url = f"sqlite:///{config.path}"
+    engine = create_engine(url)
+
+    def fn(con, _):
+        con.execute("pragma foreign_keys=ON")
+
+    event.listen(engine, "connect", fn)
+
+    return engine
+
+
+def _create_server_engine(config: ServerConfig) -> Engine:
+    url = URL(
+        drivername=config.type.lower(),
+        username=config.username,
+        password=config.password,
+        host=config.host,
+        port=config.port,
+        database=config.database,
+        query=immutabledict(),
+    )
+    return create_engine(url)
+
+
 def get_engine() -> Engine:
-    global __engine
+    global __engine, __token
 
     if __engine is None:
         if config.db.type == "SQLite":
-            url = f"sqlite:///{config.db.path}"
-            __engine = create_engine(url)
-            # SQLite 数据库默认不启用外键约束，需要手动开启
-            event.listen(
-                __engine,
-                "connect",
-                lambda con, _: con.execute("pragma foreign_keys=ON"),
-            )
+            __engine = _create_sqlite_engine(config.db)
         else:
-            url = URL(
-                drivername=config.db.type.lower(),
-                username=config.db.username,
-                password=config.db.password,
-                host=config.db.host,
-                port=config.db.port,
-                database=config.db.database,
-                query=immutabledict(),
-            )
-            __engine = create_engine(url)
+            __engine = _create_server_engine(config.db)
+
+        if __token is None:
+            create_all()
+
+        __token = object()
 
     return __engine
 
 
-def get_session() -> Session:
+def get_session() -> tuple[Session, object]:
     global __session_maker
 
     if __session_maker is None:
         __session_maker = sessionmaker(bind=get_engine())
 
-    return __session_maker()
+    return __session_maker(), get_token()
 
 
-def reload_engine():
+def validate_token(token: object) -> bool:
+    return token is get_token()
+
+
+def reload_engine() -> Engine:
     global __engine, __session_maker, __token
-    __engine = __session_maker = None
-    create_all()
-    __token = object()
 
+    if __session_maker is not None:
+        __session_maker.close_all()
 
-def get_token():
-    return __token
+    if __engine is not None:
+        __engine.dispose()
 
-
-class Base(DeclarativeBase):
-    @declared_attr.directive
-    @classmethod
-    def __tablename__(cls) -> str:
-        # 将 CamelCase 类名转换为 snake_case 表名
-        # 例如: StudentInfo -> student_info
-        name = cls.__name__
-        return "".join(
-            f"_{c.lower()}" if c.isupper() else c.lower() for c in name
-        ).lstrip("_")
+    __engine = __session_maker = __token = None
+    return get_engine()
 
 
 DEFAULT_ADMIN_SQL = """
@@ -108,6 +120,18 @@ def setup_default_data():
     with get_engine().begin() as conn:
         for stmt in stmts:
             conn.execute(text(stmt))
+
+
+class Base(DeclarativeBase):
+    @declared_attr.directive
+    @classmethod
+    def __tablename__(cls) -> str:
+        # 将 CamelCase 类名转换为 snake_case 表名
+        # 例如: StudentInfo -> student_info
+        name = cls.__name__
+        return "".join(
+            f"_{c.lower()}" if c.isupper() else c.lower() for c in name
+        ).lstrip("_")
 
 
 def create_all():

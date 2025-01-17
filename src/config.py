@@ -19,9 +19,11 @@ class ServerConfig(BaseModel):
     password: str
     database: str
 
+
 class LastLogin(BaseModel):
     role: Literal["Admin", "Teacher", "Student"]
     username: str
+
 
 class Config(BaseModel):
     db: SqliteConfig | ServerConfig = SqliteConfig()
@@ -33,10 +35,11 @@ class Config(BaseModel):
 
 
 def load_config() -> Config:
-    return Config.model_validate_json(CONFIG_FILE.read_text("utf-8"))
+    return (
+        Config.model_validate_json(CONFIG_FILE.read_text("utf-8"))
+        if CONFIG_FILE.exists()
+        else Config()
+    )
 
-
-if not CONFIG_FILE.exists():
-    Config().save()
 
 config = load_config()

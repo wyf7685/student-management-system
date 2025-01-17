@@ -3,7 +3,7 @@ import hashlib
 import uuid
 from typing import Literal
 
-from .db_config import get_session, get_token
+from .db_config import get_session, validate_token
 from .models import (
     Award,
     Class,
@@ -26,13 +26,12 @@ from .models import (
 
 class DBManager:
     def __init__(self) -> None:
-        self._session = get_session()
-        self._token = get_token()
+        self._session, self._token = get_session()
 
     @property
     def session(self):
-        if self._token is not get_token():
-            self._session = get_session()
+        if not validate_token(self._token):
+            self._session, self._token = get_session()
         return self._session
 
     def rollback(self):
