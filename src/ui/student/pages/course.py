@@ -1,6 +1,6 @@
 # course.py
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QFont
+from PyQt6.QtGui import QFont, QIcon
 from PyQt6.QtWidgets import (
     QListWidget,
     QListWidgetItem,
@@ -23,6 +23,29 @@ class CoursePage(BasePage):
 
         # 添加课表信息列表
         self.courses_list = QListWidget()
+        self.courses_list.setStyleSheet("""
+            QListWidget {
+                background-color: #f0f0f0;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 5px;
+            }
+            QListWidget::item {
+                background-color: #ffffff;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                margin: 5px;
+                padding: 10px;
+            }
+            QListWidget::item:hover {
+                background-color: #e0e0e0;
+            }
+            QListWidget::item:selected {
+                background-color: #d0d0d0;
+                font-weight: bold;
+                color: #000000;  /* 确保字体颜色为黑色 */
+            }
+        """)
         layout.addWidget(self.courses_list)
 
         self.setLayout(layout)
@@ -40,11 +63,16 @@ class CoursePage(BasePage):
             for enrollment in enrollments:
                 course = check(cdb.get_course(enrollment.course_id))
                 item_text = f"课程名称: {course.name}, 学分: {course.credits}"
-                item = QListWidgetItem(item_text)
+                item = QListWidgetItem(QIcon("path/to/icon.png"), item_text)  # 添加图标
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 font = QFont(self.courses_list.font())
                 font.setPointSize(int(font.pointSize() * 1.5))  # 放大字体并转换为整数
                 item.setFont(font)
                 self.courses_list.addItem(item)
         else:
-            self.courses_list.addItem("没有找到相关课程")
+            item = QListWidgetItem("没有找到相关课程")
+            item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            font = QFont(self.courses_list.font())
+            font.setPointSize(int(font.pointSize() * 1.5))  # 放大字体并转换为整数
+            item.setFont(font)
+            self.courses_list.addItem(item)
