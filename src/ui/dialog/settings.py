@@ -97,8 +97,15 @@ class SettingsDialog(QDialog):
         self.sqlite_config.setVisible(visible)
         self.server_config.setVisible(not visible)
 
+        is_sql_server = self.db_type_combo.currentText() == "SQL Server"
+        self.host_edit.setDisabled(is_sql_server)
+        self.port_edit.setDisabled(is_sql_server)
+        self.username_edit.setDisabled(is_sql_server)
+        self.password_edit.setDisabled(is_sql_server)
+
     def on_db_type_changed(self, db_type):
         """处理数据库类型变更"""
+
         if db_type == "SQLite":
             self.sqlite_path.setText("db.sqlite")
         else:
@@ -110,8 +117,8 @@ class SettingsDialog(QDialog):
             }[db_type]
             self.port_edit.setText(default_port)
 
-        self.load_settings()
         self.switch_sqlite_visible(visible=db_type == "SQLite")
+        self.load_settings()
 
     def browse_sqlite_file(self):
         """选择SQLite数据库文件"""
@@ -128,7 +135,7 @@ class SettingsDialog(QDialog):
         if config.db.type == "SQLite":
             self.sqlite_path.setText(str(config.db.path))
             self.switch_sqlite_visible(visible=True)
-        else:
+        elif self.db_type_combo.currentText() == config.db.type:
             self.host_edit.setText(config.db.host)
             self.port_edit.setText(str(config.db.port or ""))
             self.username_edit.setText(config.db.username)
