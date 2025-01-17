@@ -97,6 +97,7 @@ class GradePage(BasePage):
         self.course_combo_layout.removeWidget(self.course_combo)
         self.course_combo = self.create_course_combo()
         self.course_combo_layout.addWidget(self.course_combo)
+        self.update_table()
 
     def update_table(self):
         course_id = self.course_combo.get_selected()[0]
