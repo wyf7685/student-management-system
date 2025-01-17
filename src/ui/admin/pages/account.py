@@ -151,10 +151,10 @@ class ContextMenuHandler(BaseContextMenuHandler[SystemAccountController]):
             self.controller.delete(role, user_id)
 
     def setup_menu(self) -> None:
-        self.handlers[check(self.menu.addAction("添加"))] = self.handle_add
+        self.handlers[check(self.menu.addAction("添加账号"))] = self.handle_add
         if self.item is not None:
-            self.handlers[check(self.menu.addAction("编辑"))] = self.handle_edit
-            self.handlers[check(self.menu.addAction("删除"))] = self.handle_delete
+            self.handlers[check(self.menu.addAction("修改密码"))] = self.handle_edit
+            self.handlers[check(self.menu.addAction("删除账号"))] = self.handle_delete
 
 
 class AccountPage(BasePage[SystemAccountController]):
