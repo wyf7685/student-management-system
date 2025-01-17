@@ -2,9 +2,11 @@ from functools import partial
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import (
+    QHeaderView,
     QLabel,
     QMessageBox,
     QPushButton,
+    QSizePolicy,
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
@@ -34,6 +36,16 @@ class ScholarshipPage(BasePage):
             ["奖学金ID", "奖学金名称", "金额", "日期", "操作"]
         )
 
+        # 设置表格的大小策略，使其填充可用空间
+        self.table_widget.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
+
+        # 动态调整表格列宽，使每个列均匀分布
+        header = self.table_widget.horizontalHeader()
+        if header is not None:
+            header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+
         # 获取奖学金信息
         scholarships = DBManager.scholarship().get_all_scholarships()
 
@@ -60,6 +72,9 @@ class ScholarshipPage(BasePage):
 
         # 将表格添加到布局中
         layout.addWidget(self.table_widget)
+
+        # 设置布局的边距为0
+        layout.setContentsMargins(0, 0, 0, 0)
 
         # 设置布局
         self.setLayout(layout)

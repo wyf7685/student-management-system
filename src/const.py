@@ -8,8 +8,7 @@ AUTHORS = (
 )
 COPYRIGHT = "© 2025 All Rights Reserved"
 
-CONFIG_DIR = Path("config")
-CONFIG_FILE = CONFIG_DIR / "config.json"
+CONFIG_FILE = Path("settings.json")
 
 BUTTON_STYLESHEET = """\
 QPushButton {

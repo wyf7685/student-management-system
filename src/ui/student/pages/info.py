@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import (
 from const import BUTTON_STYLESHEET
 from database import DBManager
 from ui.common.page import BasePage
+from ui.dialog.password import PasswordDialog
 from utils import check
 
 
@@ -66,6 +67,10 @@ class InfoPage(BasePage):
             return btn
 
         button_layout = QHBoxLayout()
+        edit_password_btn = btn("修改密码")
+        edit_password_btn.clicked.connect(
+            PasswordDialog.as_slot(self, "Student", self.get_user_id())
+        )
         button_layout.addStretch()
         self.confirm_btn = btn("确认修改")
         self.confirm_btn.clicked.connect(self.on_confirm_modify)
@@ -94,10 +99,10 @@ class InfoPage(BasePage):
         db = DBManager.student()
         try:
             db.update_student(
-            int(self.get_user_id()),
-            phone=phone,
-            email=email,
-        )
+                int(self.get_user_id()),
+                phone=phone,
+                email=email,
+            )
         except Exception as e:
             QMessageBox.critical(self, "错误", str(e))
             db.rollback()
