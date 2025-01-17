@@ -1,4 +1,3 @@
-# award.py
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QGroupBox,
@@ -12,7 +11,7 @@ from PyQt6.QtWidgets import (
 )
 
 from database.manager import DBManager
-from ui.common.page import BasePage
+from ui.common.page import BasePage, PageTitle
 
 
 class AwardPage(BasePage):
@@ -22,10 +21,7 @@ class AwardPage(BasePage):
         layout = QVBoxLayout()
 
         # 添加标题
-        title_label = QLabel("获奖结果")
-        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
-        layout.addWidget(title_label)
+        layout.addWidget(PageTitle("获奖查询"))
 
         # 添加输入框和查询按钮
         input_group_box = QGroupBox()

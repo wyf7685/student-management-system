@@ -2,14 +2,13 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
-    QLabel,
     QListWidget,
     QListWidgetItem,
     QVBoxLayout,
 )
 
 from database.manager import DBManager
-from ui.common.page import BasePage
+from ui.common.page import BasePage, PageTitle
 from utils import check
 
 
@@ -20,10 +19,7 @@ class CoursePage(BasePage):
         layout = QVBoxLayout()
 
         # 添加标题
-        title_label = QLabel("课程信息查询")
-        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
-        layout.addWidget(title_label)
+        layout.addWidget(PageTitle("课程信息查询"))
 
         # 添加课表信息列表
         self.courses_list = QListWidget()

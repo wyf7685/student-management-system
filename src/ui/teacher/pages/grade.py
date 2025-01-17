@@ -1,4 +1,3 @@
-from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QDialog,
     QFormLayout,
@@ -15,7 +14,7 @@ from PyQt6.QtWidgets import (
 
 from database.manager import DBManager
 from ui.admin.common import BaseConfirmDialog
-from ui.common.page import BasePage
+from ui.common.page import BasePage, PageTitle
 from ui.common.selection import SelectionCombo
 
 
@@ -55,10 +54,7 @@ class GradePage(BasePage):
         layout = QVBoxLayout()
 
         # 添加标题
-        title_label = QLabel("学生评分")
-        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
-        layout.addWidget(title_label)
+        layout.addWidget(PageTitle("学生评分"))
 
         # 课程选择
         course_box = QHBoxLayout()

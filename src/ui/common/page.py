@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, ClassVar
 
-from PyQt6.QtCore import pyqtSignal
-from PyQt6.QtWidgets import QMessageBox, QWidget
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtWidgets import QLabel, QMessageBox, QWidget
 
 if TYPE_CHECKING:
     from .user_window import BaseUserWindow
@@ -29,3 +29,10 @@ class BasePage(QWidget):
 
     def init_ui(self) -> None:
         raise NotImplementedError
+
+
+class PageTitle(QLabel):
+    def __init__(self, title: str) -> None:
+        super().__init__(title)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setStyleSheet("font-size: 24px; font-weight: bold;")
