@@ -11,7 +11,7 @@ a = Analysis(
         ("app.ico", "."),
         ("src/database/default.sql", "database"),
     ],
-    hiddenimports=[],
+    hiddenimports=["mysqlclient", "psycopg2"],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
