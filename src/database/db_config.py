@@ -87,6 +87,13 @@ WHERE NOT EXISTS (
 """
 
 
+def setup_default_admin():
+    from sqlalchemy import text
+
+    with get_engine().begin() as conn:
+        conn.execute(text(DEFAULT_ADMIN_SQL))
+
+
 def setup_default_data():
     from pathlib import Path
 
@@ -99,7 +106,6 @@ def setup_default_data():
     ]
 
     with get_engine().begin() as conn:
-        conn.execute(text(DEFAULT_ADMIN_SQL))
         for stmt in stmts:
             conn.execute(text(stmt))
 
@@ -107,4 +113,4 @@ def setup_default_data():
 def create_all():
     Base.metadata.create_all(get_engine())
 
-    setup_default_data()
+    setup_default_admin()

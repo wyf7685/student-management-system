@@ -16,6 +16,7 @@ from PyQt6.QtWidgets import (
 
 from config import LastLogin, config
 from database import DBManager
+from database.db_config import setup_default_data
 from utils import check
 
 from .dialog.about import AboutDialog
@@ -100,6 +101,8 @@ class LoginWindow(QMainWindow):
 
         # 文件菜单
         file_menu = check(self.menubar.addMenu("文件"))
+        setup_default_action = check(file_menu.addAction("导入默认数据"))
+        setup_default_action.triggered.connect(setup_default_data)
         settings_action = check(file_menu.addAction("设置"))
         settings_action.triggered.connect(lambda: SettingsDialog(self).exec())
         exit_action = check(file_menu.addAction("退出"))
