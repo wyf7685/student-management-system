@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (
 )
 
 from database import DBManager
-from ui.common.page import BasePage
+from ui.common.page import BasePage, PageTitle
 
 
 class ClubPage(BasePage):
@@ -24,10 +24,7 @@ class ClubPage(BasePage):
         self.setLayout(layout)
 
         # 添加标题
-        title_label = QLabel("社团信息查询")
-        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
-        layout.addWidget(title_label)
+        layout.addWidget(PageTitle("社团信息查询"))
 
         # 添加输入框和查询按钮
         input_group_box = QGroupBox()

@@ -1,9 +1,8 @@
 from collections.abc import Generator
 
 from PyQt6.QtWidgets import (
-    QComboBox,
     QDialog,
-    QHBoxLayout,
+    QFormLayout,
     QLabel,
     QLineEdit,
     QMessageBox,
@@ -12,6 +11,7 @@ from PyQt6.QtWidgets import (
 )
 
 from database.manager import DBManager
+from ui.common.selection import SelectionCombo
 from utils import check
 
 from ..common import BaseConfirmDialog, BaseContextMenuHandler
@@ -28,103 +28,60 @@ ROLE_CONVERT = {
 }
 
 
-def create_student_select(widget: QWidget):
-    layout = QHBoxLayout()
-    widget.setLayout(layout)
-    layout.addWidget(QLabel("选择学生:"))
-    combo = QComboBox()
-    layout.addWidget(combo)
-
-    students = [
-        (student.student_id, student.name)
-        for student in DBManager.student().get_all_students()
-    ]
-    combo.addItems([f"{id} - {name}" for id, name in students])
-
-    return students, combo
-
-
-def create_teacher_select(widget: QWidget):
-    layout = QHBoxLayout()
-    widget.setLayout(layout)
-    layout.addWidget(QLabel("选择教师:"))
-    combo = QComboBox()
-    layout.addWidget(combo)
-
-    teachers = [
-        (teacher.teacher_id, teacher.name)
-        for teacher in DBManager.teacher().get_all_teachers()
-    ]
-    combo.addItems([f"{id} - {name}" for id, name in teachers])
-
-    return teachers, combo
-
-
 class AddDialog(BaseConfirmDialog):
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent, "添加系统账号")
 
     def setup_content(self, layout: QVBoxLayout):
+        self.form_layout = form = QFormLayout()
+        layout.addLayout(form)
+
         # 账号类型选择
-        role_layout = QHBoxLayout()
-        role_layout.addWidget(QLabel("账号类型:"))
-        self.role_combo = QComboBox()
-        self.role_combo.addItems(["学生", "教师", "管理员"])
-        self.role_combo.setCurrentText("学生")
-        self.role_combo.currentTextChanged.connect(self.on_role_changed)
-        role_layout.addWidget(self.role_combo)
-        layout.addLayout(role_layout)
+        self.role_selection = SelectionCombo(self, ["学生", "教师", "管理员"])
+        self.role_selection.currentTextChanged.connect(self.on_role_changed)
+        form.addRow("账号类型:", self.role_selection)
 
-        self.student_id_widget = QWidget()
-        self.student_id_widget.setVisible(True)
-        layout.addWidget(self.student_id_widget)
-        self.students, self.student_id_combo = create_student_select(
-            self.student_id_widget
+        self.student_select = SelectionCombo(
+            self,
+            inner_data=[
+                (student.student_id, student.name)
+                for student in DBManager.student().get_all_students()
+            ],
+            formatter=lambda student: f"{student[0]} - {student[1]}",
         )
+        form.addRow("选择学生:", self.student_select)
 
-        self.teacher_id_widget = QWidget()
-        self.teacher_id_widget.setVisible(False)
-        layout.addWidget(self.teacher_id_widget)
-        self.teachers, self.teacher_id_combo = create_teacher_select(
-            self.teacher_id_widget
+        self.teacher_select = SelectionCombo(
+            self,
+            inner_data=[
+                (teacher.teacher_id, teacher.name)
+                for teacher in DBManager.teacher().get_all_teachers()
+            ],
+            formatter=lambda teacher: f"{teacher[0]} - {teacher[1]}",
         )
+        form.addRow("选择教师:", self.teacher_select)
 
-        self.admin_widget = QWidget()
-        self.admin_widget.setVisible(False)
-        layout.addWidget(self.admin_widget)
-        admin_layout = QHBoxLayout()
-        self.admin_widget.setLayout(admin_layout)
-        admin_layout.addWidget(QLabel("输入管理员ID:"))
         self.admin_id_edit = QLineEdit()
-        admin_layout.addWidget(self.admin_id_edit)
+        form.addRow("输入管理员ID:", self.admin_id_edit)
 
-        self.yes_btn.setDisabled(True)
+        form.setRowVisible(2, False)
+        form.setRowVisible(3, False)
 
     def on_role_changed(self, role: str):
-        self.yes_btn.setDisabled(False)
-        self.student_id_widget.setVisible(False)
-        self.teacher_id_widget.setVisible(False)
-        self.admin_widget.setVisible(False)
-
-        match role:
-            case "学生":
-                self.student_id_widget.setVisible(True)
-            case "教师":
-                self.teacher_id_widget.setVisible(True)
-            case "管理员":
-                self.admin_widget.setVisible(True)
+        rows = {"学生": 1, "教师": 2, "管理员": 3}
+        for i in rows.values():
+            self.form_layout.setRowVisible(i, False)
+        self.form_layout.setRowVisible(rows[role], True)
 
     def get_role(self) -> str:
-        return ROLE_CONVERT[self.role_combo.currentText()]
+        return ROLE_CONVERT[self.role_selection.currentText()]
 
     def get_user_id(self) -> str:
-        match self.role_combo.currentText():
+        match self.role_selection.get_selected():
             case "学生":
-                idx = self.student_id_combo.currentIndex()
-                return str(self.students[idx][0])
+                return str(self.student_select.get_selected()[0])
             case "教师":
-                idx = self.teacher_id_combo.currentIndex()
-                return str(self.teachers[idx][0])
+                return str(self.teacher_select.get_selected()[0])
             case "管理员":
                 return self.admin_id_edit.text()
         return ""
@@ -137,21 +94,12 @@ class EditDialog(BaseConfirmDialog):
         self.user_id = user_id
 
     def setup_content(self, layout: QVBoxLayout):
-        role_layout = QHBoxLayout()
-        role_layout.addWidget(QLabel("账号类型:"))
-        role_layout.addWidget(QLabel(self.role))
-        layout.addLayout(role_layout)
-
-        user_id_layout = QHBoxLayout()
-        user_id_layout.addWidget(QLabel(f"{self.role} ID:"))
-        user_id_layout.addWidget(QLabel(self.user_id))
-        layout.addLayout(user_id_layout)
-
-        password_layout = QHBoxLayout()
-        password_layout.addWidget(QLabel("新密码:"))
+        form = QFormLayout()
+        layout.addLayout(form)
+        form.addRow("账号类型:", QLabel(self.role))
+        form.addRow(f"{self.role} ID:", QLabel(self.user_id))
         self.password_edit = QLineEdit()
-        password_layout.addWidget(self.password_edit)
-        layout.addLayout(password_layout)
+        form.addRow("新密码:", self.password_edit)
 
     def get_password(self) -> str:
         return self.password_edit.text()
@@ -167,7 +115,7 @@ class ContextMenuHandler(BaseContextMenuHandler[SystemAccountController]):
                 QMessageBox.warning(
                     self.parent,
                     "警告",
-                    f"{role} 账号 {user_id} 已存在",
+                    f"{ROLE_CONVERT[role]}账号 {user_id} 已存在",
                 )
                 return
 

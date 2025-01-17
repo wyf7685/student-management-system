@@ -1,17 +1,17 @@
+from functools import partial
+
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import (
     QLabel,
+    QMessageBox,
+    QPushButton,
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
-    QPushButton,
-    QMessageBox,
 )
 
 from database.manager import DBManager
-from database.models import Scholarship
 from ui.common.page import BasePage
-from functools import partial
 
 
 class ScholarshipPage(BasePage):
@@ -70,10 +70,7 @@ class ScholarshipPage(BasePage):
         if item is None:
             QMessageBox.critical(self, "错误", "无法获取奖学金ID，请刷新页面并重试。")
             return
-
-        try:
-            scholarship_id = int(item.text())
-        except ValueError:
+        if not item.text().isdigit():
             QMessageBox.critical(self, "错误", "奖学金ID无效，请联系管理员。")
             return
 

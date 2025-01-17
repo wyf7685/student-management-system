@@ -69,6 +69,24 @@ class Base(DeclarativeBase):
         ).lstrip("_")
 
 
+DEFAULT_ADMIN_SQL = """
+INSERT INTO system_account (
+    role, password, salt, student_id, teacher_id, admin_id
+)
+SELECT
+    'Admin',
+    '697d423a3558f0ab2e71cea50014029628ee62cd154e1e81d5cd960932cce9b6',
+    'default',
+    NULL,
+    NULL,
+    'admin'
+WHERE NOT EXISTS (
+    SELECT 1 FROM system_account
+    WHERE role = 'Admin' AND admin_id = 'admin'
+);
+"""
+
+
 def setup_default_data():
     from pathlib import Path
 
@@ -81,6 +99,7 @@ def setup_default_data():
     ]
 
     with get_engine().begin() as conn:
+        conn.execute(text(DEFAULT_ADMIN_SQL))
         for stmt in stmts:
             conn.execute(text(stmt))
 

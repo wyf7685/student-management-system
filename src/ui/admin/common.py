@@ -12,6 +12,8 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from database.manager import DBManager
+from ui.common.selection import SelectionCombo
 from utils import check as check
 
 if TYPE_CHECKING:
@@ -88,3 +90,33 @@ class BaseConfirmDialog(QDialog):
 
     def setup_content(self, layout: QVBoxLayout):
         pass
+
+
+class CollegeSelectionCombo(SelectionCombo):
+    def __init__(self, parent: QWidget, default: int | None = None) -> None:
+        super().__init__(
+            parent,
+            [(c.college_id, c.name) for c in DBManager.college().get_all_colleges()],
+            lambda x: f"{x[0]} - {x[1]}",
+            (lambda x: x[0] == default) if default is not None else None,
+        )
+
+
+class MajorSelectionCombo(SelectionCombo):
+    def __init__(self, parent: QWidget, default: int | None = None) -> None:
+        super().__init__(
+            parent,
+            [(m.major_id, m.name) for m in DBManager.major().get_all_majors()],
+            lambda x: f"{x[0]} - {x[1]}",
+            (lambda x: x[0] == default) if default is not None else None,
+        )
+
+
+class ClassSelectionCombo(SelectionCombo):
+    def __init__(self, parent: QWidget, default: int | None = None) -> None:
+        super().__init__(
+            parent,
+            [(c.class_id, c.name) for c in DBManager.class_().get_all_classes()],
+            lambda x: f"{x[0]} - {x[1]}",
+            (lambda x: x[0] == default) if default is not None else None,
+        )
