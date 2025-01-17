@@ -50,7 +50,6 @@ class GradePage(BasePage):
     button_name = "学生评分"
 
     def init_ui(self) -> None:
-        teacher_id = int(self.get_user_id())
         layout = QVBoxLayout()
 
         # 添加标题
@@ -60,17 +59,14 @@ class GradePage(BasePage):
         course_box = QHBoxLayout()
         course_box.addStretch()
         course_label = QLabel("选择课程：")
-        self.course_combo = SelectionCombo(
-            self,
-            [
-                (c.course_id, c.name)
-                for c in DBManager.course().get_courses_by_teacher(teacher_id)
-            ],
-            formatter=lambda c: f"{c[0]} - {c[1]}",
-        )
-        self.course_combo.currentIndexChanged.connect(self.update_table)
         course_box.addWidget(course_label)
-        course_box.addWidget(self.course_combo)
+        self.course_combo_layout = QHBoxLayout()
+        self.course_combo = self.create_course_combo()
+        self.course_combo_layout.addWidget(self.course_combo)
+        course_box.addLayout(self.course_combo_layout)
+        refresh_course_button = QPushButton("刷新")
+        refresh_course_button.clicked.connect(self.refresh_course_combo)
+        course_box.addWidget(refresh_course_button)
         layout.addLayout(course_box)
 
         # 成绩表格
@@ -83,6 +79,24 @@ class GradePage(BasePage):
 
         self.setLayout(layout)
         self.update_table()
+
+    def create_course_combo(self):
+        teacher_id = int(self.get_user_id())
+        combo = SelectionCombo(
+            self,
+            [
+                (c.course_id, c.name)
+                for c in DBManager.course().get_courses_by_teacher(teacher_id)
+            ],
+            formatter=lambda c: f"{c[0]} - {c[1]}",
+        )
+        combo.currentIndexChanged.connect(self.update_table)
+        return combo
+
+    def refresh_course_combo(self):
+        self.course_combo_layout.removeWidget(self.course_combo)
+        self.course_combo = self.create_course_combo()
+        self.course_combo_layout.addWidget(self.course_combo)
 
     def update_table(self):
         course_id = self.course_combo.get_selected()[0]
