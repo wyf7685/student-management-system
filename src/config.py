@@ -12,9 +12,9 @@ class SqliteConfig(BaseModel):
 
 
 class ServerConfig(BaseModel):
-    type: Literal["MySQL", "PostgreSQL"]
+    type: Literal["SQL Server", "MySQL", "PostgreSQL"]
     host: str
-    port: int
+    port: int | None
     username: str
     password: str
     database: str

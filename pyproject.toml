@@ -7,7 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "pydantic>=2.10.5",
     "pyqt6>=6.8.0",
-    "sqlalchemy[mysql,postgresql]>=2.0.37",
+    "sqlalchemy[mssql,mysql,postgresql]>=2.0.37",
 ]
 
 [tool.ruff]

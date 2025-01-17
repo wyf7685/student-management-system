@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import ClassVar, Literal
 
 from sqlalchemy import CheckConstraint, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -9,6 +9,12 @@ from .teacher import Teacher
 
 
 class SystemAccount(Base):
+    __table_args__: ClassVar = (
+        CheckConstraint("role != 'Student' OR student_id IS NOT NULL"),
+        CheckConstraint("role != 'Teacher' OR teacher_id IS NOT NULL"),
+        CheckConstraint("role != 'Admin' OR admin_id IS NOT NULL"),
+    )
+
     id: Mapped[int] = mapped_column(
         Integer,
         nullable=False,
@@ -25,18 +31,15 @@ class SystemAccount(Base):
     student_id: Mapped[int | None] = mapped_column(
         Integer,
         ForeignKey(Student.student_id),
-        CheckConstraint("role != 'Student' OR student_id IS NOT NULL"),
         nullable=True,
     )
     teacher_id: Mapped[int | None] = mapped_column(
         Integer,
         ForeignKey(Teacher.teacher_id),
-        CheckConstraint("role != 'Teacher' OR teacher_id IS NOT NULL"),
         nullable=True,
     )
     admin_id: Mapped[str | None] = mapped_column(
         String,
-        CheckConstraint("role != 'Admin' OR admin_id IS NOT NULL"),
         nullable=True,
     )
 

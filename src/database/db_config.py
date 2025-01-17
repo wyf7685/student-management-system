@@ -17,17 +17,63 @@ def _create_sqlite_engine(config: SqliteConfig) -> Engine:
     url = f"sqlite:///{config.path}"
     engine = create_engine(url)
 
-    def fn(con, _):
+    @event.listens_for(engine, "connect")
+    def _(con, _):
         con.execute("pragma foreign_keys=ON")
 
-    event.listen(engine, "connect", fn)
+    return engine
+
+
+def _create_sql_server_engine(config: ServerConfig) -> Engine:
+    driver = "mssql+pyodbc"
+    query = {
+        "driver": "ODBC Driver 17 for SQL Server",
+        "Trusted_Connection": "yes",
+    }
+    url = URL(
+        drivername=driver,
+        username=None,
+        password=None,
+        host=config.host,
+        port=None,
+        database=config.database,
+        query=immutabledict(query),
+    )
+    engine = create_engine(url)
+
+    skip_table_name = (
+        "student_club",
+        "grade",
+        "course_enrollment",
+        "course_teacher",
+    )
+
+    @event.listens_for(engine, "before_cursor_execute")
+    def _(__, cursor, statement: str, *_):
+        if statement.strip().upper().startswith("INSERT"):
+            table_name = statement.split()[2].strip()
+            if table_name not in skip_table_name:
+                cursor.execute(f"SET IDENTITY_INSERT {table_name} ON")
+
+    @event.listens_for(engine, "after_cursor_execute")
+    def _(__, cursor, statement, *_):
+        if statement.strip().upper().startswith("INSERT"):
+            table_name = statement.split()[2].strip()
+            if table_name not in skip_table_name:
+                cursor.execute(f"SET IDENTITY_INSERT {table_name} OFF")
 
     return engine
 
 
 def _create_server_engine(config: ServerConfig) -> Engine:
+    if config.type == "SQL Server":
+        return _create_sql_server_engine(config)
+
     url = URL(
-        drivername=config.type.lower(),
+        drivername={
+            "MySQL": "mysql+mysqlclient",
+            "PostgreSQL": "postgresql+psycopg2",
+        }[config.type],
         username=config.username,
         password=config.password,
         host=config.host,
@@ -83,9 +129,10 @@ def reload_engine() -> Engine:
 
 DEFAULT_ADMIN_SQL = """
 INSERT INTO system_account (
-    role, password, salt, student_id, teacher_id, admin_id
+    id, role, password, salt, student_id, teacher_id, admin_id
 )
 SELECT
+    3,
     'Admin',
     '697d423a3558f0ab2e71cea50014029628ee62cd154e1e81d5cd960932cce9b6',
     'default',
@@ -114,7 +161,7 @@ def setup_default_data():
     stmts = [
         s.strip()
         for s in (Path(__file__).parent / "default.sql").read_text("utf-8").split(";")
-        if s.strip()
+        if s.strip() and not s.strip().startswith("--")
     ]
 
     with get_engine().begin() as conn:

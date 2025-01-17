@@ -38,7 +38,7 @@ class SettingsDialog(QDialog):
         db_type_layout = QHBoxLayout()
         db_type_layout.addWidget(QLabel("数据库类型:"))
         self.db_type_combo = QComboBox()
-        self.db_type_combo.addItems(["SQLite", "MySQL", "PostgreSQL"])
+        self.db_type_combo.addItems(["SQLite", "SQL Server", "MySQL", "PostgreSQL"])
         self.db_type_combo.setCurrentText(config.db.type)
         self.db_type_combo.currentTextChanged.connect(self.on_db_type_changed)
         db_type_layout.addWidget(self.db_type_combo)
@@ -103,7 +103,12 @@ class SettingsDialog(QDialog):
             self.sqlite_path.setText("db.sqlite")
         else:
             self.host_edit.setText("localhost")
-            self.port_edit.setText("3306" if db_type == "MySQL" else "5432")
+            default_port = {
+                "SQL Server": "",
+                "MySQL": "3306",
+                "PostgreSQL": "5432",
+            }[db_type]
+            self.port_edit.setText(default_port)
 
         self.load_settings()
         self.switch_sqlite_visible(visible=db_type == "SQLite")
@@ -125,7 +130,7 @@ class SettingsDialog(QDialog):
             self.switch_sqlite_visible(visible=True)
         else:
             self.host_edit.setText(config.db.host)
-            self.port_edit.setText(str(config.db.port))
+            self.port_edit.setText(str(config.db.port or ""))
             self.username_edit.setText(config.db.username)
             self.password_edit.setText(config.db.password)
             self.database_edit.setText(config.db.database)
@@ -140,7 +145,7 @@ class SettingsDialog(QDialog):
             config.db = ServerConfig(
                 type=self.db_type_combo.currentText(),  # type:ignore[]
                 host=self.host_edit.text(),
-                port=int(self.port_edit.text()),
+                port=int(port) if (port := self.port_edit.text()) else None,
                 username=self.username_edit.text(),
                 password=self.password_edit.text(),
                 database=self.database_edit.text(),
