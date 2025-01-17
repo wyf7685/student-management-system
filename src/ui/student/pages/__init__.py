@@ -1,5 +1,6 @@
 from ui.common.page import BasePage
 
+from .account import AccountPage
 from .award import AwardPage
 from .club import ClubPage
 from .course import CoursePage
@@ -16,4 +17,5 @@ PAGES: tuple[type[BasePage], ...] = (
     AwardPage,
     ScholarshipPage,
     ClubPage,
+    AccountPage,
 )
