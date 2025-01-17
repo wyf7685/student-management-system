@@ -12,17 +12,23 @@ CONFIG_FILE = Path("settings.json")
 
 BUTTON_STYLESHEET = """\
 QPushButton {
-  padding: 8px;
-  background-color: #59a5fb;
-  color: white;
-  border-radius: 4px;
+    padding: 8px 16px;
+    background-color: #2196F3;
+    color: white;
+    border-radius: 4px;
+    border: none;
+    font-size: 14px;
+    font-weight: bold;
+    min-width: 80px;
 }
 QPushButton:hover {
-  background-color: #337ec9;
+    background-color: #1976D2;
+}
+QPushButton:pressed {
+    background-color: #0D47A1;
 }
 QPushButton:disabled {
-    background-color: #cccccc;
-    color: #666666;
-    opacity: 0.6;
+    background-color: #E0E0E0;
+    color: #9E9E9E;
 }
 """
