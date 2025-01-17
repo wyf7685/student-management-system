@@ -136,9 +136,9 @@ class CoursePage(BasePage):
 
             item_status = QTableWidgetItem(status)
             item_status.setFont(QFont("Arial", 12))
-            item_status.setForeground(
-                QColor("blue") if course.course_id in teaching else QColor("black")
-            )
+            # item_status.setForeground(
+            #     QColor("blue") if course.course_id in teaching else QColor("black")
+            # )
             self.course_table.setItem(row, 3, item_status)
 
         self.teaching = teaching
