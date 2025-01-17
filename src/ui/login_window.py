@@ -5,6 +5,7 @@ from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
     QComboBox,
     QFormLayout,
+    QHBoxLayout,
     QLabel,
     QLineEdit,
     QMainWindow,
@@ -15,6 +16,7 @@ from PyQt6.QtWidgets import (
 )
 
 from config import LastLogin, config
+from const import BUTTON_STYLESHEET
 from database import DBManager
 from database.db_config import setup_default_data
 from utils import check
@@ -48,28 +50,30 @@ class LoginWindow(QMainWindow):
 
         # 创建中央部件和主布局
         central_widget = QWidget()
+        central_layout = QVBoxLayout()
+        layout_h = QHBoxLayout()
+        layout_h.addSpacing(40)
+        layout_h.addLayout(central_layout)
+        layout_h.addSpacing(40)
+        central_widget.setLayout(layout_h)
         self.setCentralWidget(central_widget)
-        main_layout = QVBoxLayout(central_widget)
 
         # 创建标题标签
         title_label = QLabel("学生信息管理系统")
         title_label.setFont(QFont("Arial", 16, QFont.Weight.Bold))
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        main_layout.addWidget(title_label)
+        central_layout.addWidget(title_label)
 
         # 创建表单布局
         form_layout = QFormLayout()
-        main_layout.addLayout(form_layout)
-
+        central_layout.addLayout(form_layout)
         # 创建身份选择下拉框
         self.role_combo = QComboBox()
         self.role_combo.addItems(["学生", "教师", "管理员"])
         form_layout.addRow("选择身份:", self.role_combo)
-
         # 创建用户名输入框
         self.username_input = QLineEdit()
         form_layout.addRow("用户名:", self.username_input)
-
         # 创建密码输入框
         self.password_input = QLineEdit()
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
@@ -77,8 +81,15 @@ class LoginWindow(QMainWindow):
 
         # 创建登录按钮
         login_button = QPushButton("登录")
+        login_button.setMinimumWidth(100)
+        login_button.setMaximumWidth(250)
+        login_button.setStyleSheet(BUTTON_STYLESHEET)
         login_button.clicked.connect(self.handle_login)
-        main_layout.addWidget(login_button)
+        button_layout = QHBoxLayout()
+        button_layout.addStretch()
+        button_layout.addWidget(login_button)
+        button_layout.addStretch()
+        central_layout.addLayout(button_layout)
 
         # 加载上次登录信息
         self.load_last_login()

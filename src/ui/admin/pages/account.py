@@ -99,6 +99,7 @@ class EditDialog(BaseConfirmDialog):
         form.addRow("账号类型:", QLabel(self.role))
         form.addRow(f"{self.role} ID:", QLabel(self.user_id))
         self.password_edit = QLineEdit()
+        self.password_edit.setEchoMode(QLineEdit.EchoMode.Password)
         form.addRow("新密码:", self.password_edit)
 
     def get_password(self) -> str:
