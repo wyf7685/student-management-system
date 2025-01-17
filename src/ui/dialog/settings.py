@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import (
     QComboBox,
     QDialog,
     QFileDialog,
+    QFormLayout,
     QGroupBox,
     QHBoxLayout,
     QLabel,
@@ -32,6 +33,7 @@ class SettingsDialog(QDialog):
         # 数据库设置组
         db_group = QGroupBox("数据库设置")
         db_layout = QVBoxLayout()
+
         # 数据库类型选择
         db_type_layout = QHBoxLayout()
         db_type_layout.addWidget(QLabel("数据库类型:"))
@@ -43,6 +45,7 @@ class SettingsDialog(QDialog):
         db_layout.addLayout(db_type_layout)
 
         # SQLite配置
+        self.sqlite_config = QWidget()
         self.sqlite_layout = QHBoxLayout()
         self.sqlite_layout.addWidget(QLabel("数据库文件:"))
         self.sqlite_path = QLineEdit()
@@ -50,54 +53,27 @@ class SettingsDialog(QDialog):
         self.sqlite_browse.clicked.connect(self.browse_sqlite_file)
         self.sqlite_layout.addWidget(self.sqlite_path)
         self.sqlite_layout.addWidget(self.sqlite_browse)
-        db_layout.addLayout(self.sqlite_layout)
+        self.sqlite_config.setLayout(self.sqlite_layout)
+        db_layout.addWidget(self.sqlite_config)
 
         # MySQL/PostgreSQL配置
         self.server_config = QWidget()
-        server_layout = QVBoxLayout()
-
-        host_layout = QHBoxLayout()
-        host_layout.addWidget(QLabel("主机:"))
+        server_layout = QFormLayout()
         self.host_edit = QLineEdit()
-        host_layout.addWidget(self.host_edit)
-
-        port_layout = QHBoxLayout()
-        port_layout.addWidget(QLabel("端口:"))
         self.port_edit = QLineEdit()
-        port_layout.addWidget(self.port_edit)
-
-        username_layout = QHBoxLayout()
-        username_layout.addWidget(QLabel("用户名:"))
         self.username_edit = QLineEdit()
-        username_layout.addWidget(self.username_edit)
-
-        password_layout = QHBoxLayout()
-        password_layout.addWidget(QLabel("密码:"))
         self.password_edit = QLineEdit()
         self.password_edit.setEchoMode(QLineEdit.EchoMode.Password)
-        password_layout.addWidget(self.password_edit)
-
-        database_layout = QHBoxLayout()
-        database_layout.addWidget(QLabel("数据库:"))
         self.database_edit = QLineEdit()
-        database_layout.addWidget(self.database_edit)
-
-        server_layout.addLayout(host_layout)
-        server_layout.addLayout(port_layout)
-        server_layout.addLayout(username_layout)
-        server_layout.addLayout(password_layout)
-        server_layout.addLayout(database_layout)
+        server_layout.addRow("主机:", self.host_edit)
+        server_layout.addRow("端口:", self.port_edit)
+        server_layout.addRow("用户名:", self.username_edit)
+        server_layout.addRow("密码:", self.password_edit)
+        server_layout.addRow("数据库:", self.database_edit)
         self.server_config.setLayout(server_layout)
         db_layout.addWidget(self.server_config)
 
         db_group.setLayout(db_layout)
-
-        # 主题设置
-        # theme_layout = QHBoxLayout()
-        # theme_layout.addWidget(QLabel("主题:"))
-        # self.theme_combo = QComboBox()
-        # self.theme_combo.addItems(["浅色", "深色"])
-        # theme_layout.addWidget(self.theme_combo)
 
         # 按钮
         btn_layout = QHBoxLayout()
@@ -109,7 +85,6 @@ class SettingsDialog(QDialog):
         btn_layout.addWidget(cancel_btn)
 
         layout.addWidget(db_group)
-        # layout.addLayout(theme_layout)
         layout.addStretch()
         layout.addLayout(btn_layout)
 
@@ -119,14 +94,13 @@ class SettingsDialog(QDialog):
         self.on_db_type_changed("SQLite")
 
     def switch_sqlite_visible(self, *, visible: bool):
-        self.sqlite_path.setVisible(visible)
-        self.sqlite_browse.setVisible(visible)
+        self.sqlite_config.setVisible(visible)
         self.server_config.setVisible(not visible)
 
     def on_db_type_changed(self, db_type):
         """处理数据库类型变更"""
-        self.switch_sqlite_visible(visible=db_type == "SQLite")
         self.load_settings()
+        self.switch_sqlite_visible(visible=db_type == "SQLite")
 
         if db_type != "SQLite":
             # 设置默认端口
