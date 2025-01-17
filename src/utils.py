@@ -3,8 +3,13 @@ from pathlib import Path
 
 
 def check[T](value: T | None, /) -> T:
-    assert value is not None
-    return value
+    if value is not None:
+        return value
+
+    frame = sys._getframe(1)  # noqa: SLF001
+    filename = frame.f_code.co_filename
+    lineno = frame.f_lineno
+    raise ValueError(f"Value is None at {filename}:{lineno}")
 
 
 def get_resource_path(relative_path: str):
