@@ -81,8 +81,7 @@ WHERE NOT EXISTS (
 -- WHERE NOT EXISTS (
 --     SELECT 1 FROM system_account 
 --     WHERE role = 'Admin' AND admin_id = 'admin'
--- );
-
+-- )
 
 -- 插入奖项信息
 INSERT INTO award (award_id, student_id, award_name, award_date)

@@ -102,7 +102,7 @@ class LoginWindow(QMainWindow):
         # 文件菜单
         file_menu = check(self.menubar.addMenu("文件"))
         setup_default_action = check(file_menu.addAction("导入默认数据"))
-        setup_default_action.triggered.connect(setup_default_data)
+        setup_default_action.triggered.connect(self.handle_setup_default_data)
         settings_action = check(file_menu.addAction("设置"))
         settings_action.triggered.connect(lambda: SettingsDialog(self).exec())
         exit_action = check(file_menu.addAction("退出"))
@@ -128,3 +128,11 @@ class LoginWindow(QMainWindow):
 
         self.save_last_login(role, username)
         self.switch_window(role, username)
+
+    def handle_setup_default_data(self):
+        try:
+            setup_default_data()
+        except Exception as err:
+            QMessageBox.critical(self, "错误", f"导入默认数据失败：{err}")
+        else:
+            QMessageBox.information(self, "成功", "导入默认数据成功！")
