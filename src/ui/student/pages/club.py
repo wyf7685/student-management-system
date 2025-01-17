@@ -1,14 +1,16 @@
 from PyQt6.QtCore import QPoint, Qt
 from PyQt6.QtGui import QAction, QFont
 from PyQt6.QtWidgets import (
+    QFrame,
     QGroupBox,
     QHBoxLayout,
+    QHeaderView,
     QLabel,
     QLineEdit,
-    QListWidget,
-    QListWidgetItem,
     QMenu,
     QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
     QVBoxLayout,
 )
 
@@ -22,6 +24,11 @@ class ClubPage(BasePage):
     def init_ui(self):
         layout = QVBoxLayout()
         self.setLayout(layout)
+
+        # 设置全局字体大小
+        font = QFont()
+        font.setPointSize(12)
+        self.setFont(font)
 
         # 添加标题
         layout.addWidget(PageTitle("社团信息查询"))
@@ -37,18 +44,44 @@ class ClubPage(BasePage):
         input_group_layout.addWidget(self.search_button)
         layout.addWidget(input_group_box)
 
-        # 添加社团信息列表
-        self.clubs_list = QListWidget()
-        self.clubs_list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.clubs_list.customContextMenuRequested.connect(
+        # 添加社团信息表格
+        self.clubs_table = QTableWidget()
+        self.clubs_table.setColumnCount(3)
+        self.clubs_table.setHorizontalHeaderLabels(["社团名称", "描述", "报名状态"])
+        self.clubs_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.clubs_table.customContextMenuRequested.connect(
             self.handle_list_context_menu
         )
-        layout.addWidget(self.clubs_list)
+        header = self.clubs_table.horizontalHeader()
+        if header is not None:
+            header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+            header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+            header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        layout.addWidget(self.clubs_table)
 
-        self.search_button.clicked.connect(self.update_clubs_list)
-        self.update_clubs_list()
+        # 添加报名信息框
+        self.enrollment_frame = QFrame()
+        self.enrollment_frame.setFrameShape(QFrame.Shape.StyledPanel)
+        self.enrollment_frame.setFrameShadow(QFrame.Shadow.Raised)
+        self.enrollment_frame.setFixedHeight(200)  # 设置固定高度
+        enrollment_layout = QVBoxLayout()
+        self.enrollment_label = QLabel("请选择一个社团以查看报名信息")
+        self.enrollment_label.setAlignment(Qt.AlignmentFlag.AlignTop)  # 文本对齐方式
+        enrollment_layout.addWidget(self.enrollment_label)
 
-    def update_clubs_list(self) -> None:
+        # 添加提示信息
+        self.hint_label = QLabel("右键选择是否加入社团，再次右键退出社团")
+        self.hint_label.setStyleSheet("color: gray; font-size: 10px;")
+        enrollment_layout.addWidget(self.hint_label)
+
+        self.enrollment_frame.setLayout(enrollment_layout)
+        layout.addWidget(self.enrollment_frame)
+
+        self.search_button.clicked.connect(self.update_clubs_table)
+        self.clubs_table.cellClicked.connect(self.update_enrollment_info)
+        self.update_clubs_table()
+
+    def update_clubs_table(self) -> None:
         keyword = self.keyword_edit.text().strip()
 
         db = DBManager.club()
@@ -62,46 +95,65 @@ class ClubPage(BasePage):
         ]
         clubs.sort(key=lambda c: (c.club_id not in joined, c.club_id))
 
-        self.clubs_list.clear()
-        for club in clubs:
-            sign = "◆" if club.club_id in joined else "◇"
-            item = QListWidgetItem(f"{sign} {club.name}  -  {club.description}")
-            item.setFont(QFont("Arial", 12))
-            self.clubs_list.addItem(item)
+        self.clubs_table.setRowCount(len(clubs))
+        for row, club in enumerate(clubs):
+            status = "报名中..." if club.club_id in joined else "未报名..."
+            self.clubs_table.setItem(row, 0, QTableWidgetItem(club.name))
+            self.clubs_table.setItem(row, 1, QTableWidgetItem(club.description))
+            self.clubs_table.setItem(row, 2, QTableWidgetItem(status))
 
         self.joined = joined
         self.clubs = [c.club_id for c in clubs]
 
     def handle_list_context_menu(self, pos: QPoint):
-        if not self.clubs_list.currentItem():
+        current_item = self.clubs_table.itemAt(pos)
+        if not current_item:
             return
 
-        cid = self.clubs[self.clubs_list.currentRow()]
+        row = current_item.row()
+        cid = self.clubs[row]
         if cid not in self.joined:
             menu = self.create_join_ctx_menu(cid)
         else:
             menu = self.create_quit_ctx_menu(cid)
-        menu.exec(self.clubs_list.mapToGlobal(pos))
-        self.update_clubs_list()
+        menu.exec(self.clubs_table.mapToGlobal(pos))
+        self.update_clubs_table()
 
     def create_join_ctx_menu(self, club_id: int):
         menu = QMenu(self)
-        join_action = QAction("加入", self)
-        join_action.triggered.connect(
-            lambda: DBManager.student_club().add_student_club(
-                int(self.get_user_id()), club_id, "member"
-            )
-        )
+        join_action = QAction("报名", self)
+        join_action.triggered.connect(lambda: self.handle_join_action(club_id))
         menu.addAction(join_action)
         return menu
 
     def create_quit_ctx_menu(self, club_id: int):
         menu = QMenu(self)
-        join_action = QAction("退出", self)
-        join_action.triggered.connect(
-            lambda: DBManager.student_club().delete_student_club(
-                int(self.get_user_id()), club_id
-            )
-        )
-        menu.addAction(join_action)
+        quit_action = QAction("退出", self)
+        quit_action.triggered.connect(lambda: self.handle_quit_action(club_id))
+        menu.addAction(quit_action)
         return menu
+
+    def handle_join_action(self, club_id: int):
+        DBManager.student_club().add_student_club(
+            int(self.get_user_id()), club_id, "member"
+        )
+        self.update_clubs_table()
+
+    def handle_quit_action(self, club_id: int):
+        DBManager.student_club().delete_student_club(int(self.get_user_id()), club_id)
+        self.update_clubs_table()
+
+    def update_enrollment_info(self, row: int, column: int):  
+    # 确保 clubs 列表是最新的
+     if not hasattr(self, "clubs") or not self.clubs:
+        self.update_clubs_table()
+
+     cid = self.clubs[row]
+     status = "报名中..." if cid in self.joined else "未报名..."
+     # 从原始的 clubs 数据中查找描述信息
+     club_data = next((club for club in DBManager.club().get_all_clubs() if club.club_id == cid), None) 
+     description = club_data.description if club_data else "无描述信息"
+
+     self.enrollment_label.setText(
+        f"社团ID: {cid}\n状态: {status}\n描述: {description}"
+    )
