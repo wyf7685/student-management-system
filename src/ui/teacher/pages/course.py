@@ -1,6 +1,5 @@
-# file:d:\student-management-system\src\ui\teacher\pages\course.py
 from PyQt6.QtCore import QPoint, Qt
-from PyQt6.QtGui import QAction, QColor, QFont
+from PyQt6.QtGui import QAction, QFont
 from PyQt6.QtWidgets import (
     QComboBox,
     QDialog,
