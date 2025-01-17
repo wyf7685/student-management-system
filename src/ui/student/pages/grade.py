@@ -6,6 +6,7 @@ from database.manager import DBManager
 from ui.common.page import BasePage
 from utils import check
 
+
 class GradePage(BasePage):
     button_name = "成绩查询"
 
