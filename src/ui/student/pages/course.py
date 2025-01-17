@@ -25,25 +25,25 @@ class CoursePage(BasePage):
         self.courses_list = QListWidget()
         self.courses_list.setStyleSheet("""
             QListWidget {
-                background-color: #f0f0f0;
-                border: 1px solid #ccc;
+                background-color: transparent;
+                border: 1px solid palette(mid);
                 border-radius: 5px;
                 padding: 5px;
             }
             QListWidget::item {
-                background-color: #ffffff;
-                border: 1px solid #ddd;
+                background-color: palette(base);
+                border: 1px solid palette(midlight);
                 border-radius: 5px;
                 margin: 5px;
                 padding: 10px;
             }
             QListWidget::item:hover {
-                background-color: #e0e0e0;
+                background-color: palette(highlight);
             }
             QListWidget::item:selected {
-                background-color: #d0d0d0;
+                background-color: palette(highlight);
                 font-weight: bold;
-                color: #000000;  /* 确保字体颜色为黑色 */
+                color: palette(text);  /* 使用系统默认字体颜色 */
             }
         """)
         layout.addWidget(self.courses_list)
