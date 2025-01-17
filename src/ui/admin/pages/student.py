@@ -14,7 +14,16 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from ..common import BaseConfirmDialog, BaseContextMenuHandler, check
+from ui.common.selection import SelectionCombo
+
+from ..common import (
+    BaseConfirmDialog,
+    BaseContextMenuHandler,
+    ClassSelectionCombo,
+    CollegeSelectionCombo,
+    MajorSelectionCombo,
+    check,
+)
 from ..controllers.student import StudentController
 from ..page import BasePage
 
@@ -29,14 +38,13 @@ class AddDialog(BaseConfirmDialog):
         # 创建输入控件
         self.id_input = QLineEdit()
         self.name_input = QLineEdit()
-        self.gender_input = QComboBox()
-        self.gender_input.addItems(["男", "女"])
+        self.gender_selection = SelectionCombo(self, ["男", "女"])
         self.birth_input = QDateEdit()
         self.phone_input = QLineEdit()
         self.email_input = QLineEdit()
-        self.college_id_input = QLineEdit()
-        self.major_id_input = QLineEdit()
-        self.class_id_input = QLineEdit()
+        self.college_selection = CollegeSelectionCombo(self)
+        self.major_selection = MajorSelectionCombo(self)
+        self.class_selection = ClassSelectionCombo(self)
         self.enrollment_input = QDateEdit()
 
         # 设置宽度
@@ -46,13 +54,13 @@ class AddDialog(BaseConfirmDialog):
         # 添加到表单
         form_layout.addRow("学号:", self.id_input)
         form_layout.addRow("姓名:", self.name_input)
-        form_layout.addRow("性别:", self.gender_input)
+        form_layout.addRow("性别:", self.gender_selection)
         form_layout.addRow("出生日期:", self.birth_input)
         form_layout.addRow("手机:", self.phone_input)
         form_layout.addRow("邮箱:", self.email_input)
-        form_layout.addRow("学院代码:", self.college_id_input)
-        form_layout.addRow("专业代码:", self.major_id_input)
-        form_layout.addRow("班级代码:", self.class_id_input)
+        form_layout.addRow("学院:", self.college_selection)
+        form_layout.addRow("专业:", self.major_selection)
+        form_layout.addRow("班级:", self.class_selection)
         form_layout.addRow("入学日期:", self.enrollment_input)
 
         layout.addLayout(form_layout)
@@ -61,13 +69,13 @@ class AddDialog(BaseConfirmDialog):
         return (
             self.id_input.text().strip(),
             self.name_input.text().strip(),
-            "M" if self.gender_input.currentText() == "男" else "F",
+            "M" if self.gender_selection.get_selected() == "男" else "F",
             self.birth_input.date().toPyDate().strftime("%Y-%m-%d"),
             self.phone_input.text().strip(),
             self.email_input.text().strip(),
-            self.college_id_input.text().strip(),
-            self.major_id_input.text().strip(),
-            self.class_id_input.text().strip(),
+            self.college_selection.get_selected()[0],
+            self.major_selection.get_selected()[0],
+            self.class_selection.get_selected()[0],
             self.enrollment_input.date().toPyDate().strftime("%Y-%m-%d"),
         )
 
@@ -88,7 +96,6 @@ class EditDialog(BaseConfirmDialog):
         self.gender_input = QComboBox()
         self.gender_input.addItems(["男", "女"])
         self.gender_input.setCurrentText(self.student_data[2])
-
         self.birth_input = QDateEdit()
         self.birth_input.setDate(
             datetime.strptime(self.student_data[3], "%Y-%m-%d").date()
@@ -96,9 +103,9 @@ class EditDialog(BaseConfirmDialog):
 
         self.phone_input = QLineEdit(self.student_data[4])
         self.email_input = QLineEdit(self.student_data[5])
-        self.college_id_input = QLineEdit(self.student_data[6])
-        self.major_id_input = QLineEdit(self.student_data[7])
-        self.class_id_input = QLineEdit(self.student_data[8])
+        self.college_selection = CollegeSelectionCombo(self, int(self.student_data[6]))
+        self.major_selection = MajorSelectionCombo(self, int(self.student_data[7]))
+        self.class_selection = ClassSelectionCombo(self, int(self.student_data[8]))
 
         self.enrollment_input = QDateEdit()
         self.enrollment_input.setDate(
@@ -112,9 +119,9 @@ class EditDialog(BaseConfirmDialog):
         form_layout.addRow("出生日期:", self.birth_input)
         form_layout.addRow("手机:", self.phone_input)
         form_layout.addRow("邮箱:", self.email_input)
-        form_layout.addRow("学院代码:", self.college_id_input)
-        form_layout.addRow("专业代码:", self.major_id_input)
-        form_layout.addRow("班级代码:", self.class_id_input)
+        form_layout.addRow("学院代码:", self.college_selection)
+        form_layout.addRow("专业代码:", self.major_selection)
+        form_layout.addRow("班级代码:", self.class_selection)
         form_layout.addRow("入学日期:", self.enrollment_input)
 
         layout.addLayout(form_layout)
@@ -126,9 +133,9 @@ class EditDialog(BaseConfirmDialog):
             self.birth_input.date().toPyDate().strftime("%Y-%m-%d"),
             self.phone_input.text().strip(),
             self.email_input.text().strip(),
-            self.college_id_input.text().strip(),
-            self.major_id_input.text().strip(),
-            self.class_id_input.text().strip(),
+            self.college_selection.get_selected(),
+            self.major_selection.get_selected(),
+            self.class_selection.get_selected(),
             self.enrollment_input.date().toPyDate().strftime("%Y-%m-%d"),
         )
 

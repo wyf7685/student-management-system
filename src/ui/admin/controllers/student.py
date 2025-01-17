@@ -20,9 +20,9 @@ class StudentController(BaseController[StudentDBManager]):
         birth: str,
         phone: str,
         email: str,
-        college_id: str,
-        major_id: str,
-        class_id: str,
+        college_id: int,
+        major_id: int,
+        class_id: int,
         enrollment_date: str,
     ) -> bool:
         try:
@@ -44,9 +44,9 @@ class StudentController(BaseController[StudentDBManager]):
                 birth=datetime.strptime(birth, "%Y-%m-%d"),
                 phone=phone,
                 email=email,
-                college_id=int(college_id),
-                major_id=int(major_id),
-                class_id=int(class_id),
+                college_id=college_id,
+                major_id=major_id,
+                class_id=class_id,
                 enrollment_date=datetime.strptime(enrollment_date, "%Y-%m-%d").date(),
             )
             self.db.add_student(student)
@@ -65,9 +65,9 @@ class StudentController(BaseController[StudentDBManager]):
         birth: str | None = None,
         phone: str | None = None,
         email: str | None = None,
-        college_id: str | None = None,
-        major_id: str | None = None,
-        class_id: str | None = None,
+        college_id: int | None = None,
+        major_id: int | None = None,
+        class_id: int | None = None,
         enrollment_date: str | None = None,
     ) -> bool:
         try:
@@ -89,9 +89,9 @@ class StudentController(BaseController[StudentDBManager]):
                 birth=birth_dt,
                 phone=phone,
                 email=email,
-                college_id=int(college_id) if college_id else None,
-                major_id=int(major_id) if major_id else None,
-                class_id=int(class_id) if class_id else None,
+                college_id=college_id or None,
+                major_id=major_id or None,
+                class_id=class_id or None,
                 enrollment_date=enroll_dt,
             )
 

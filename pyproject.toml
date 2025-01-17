@@ -79,6 +79,7 @@ ignore = [
     "S311",   # suspicious-non-cryptographic-random-usage
     "S101",   # assert
     "ANN204", # missing-return-type-special-method
+    "FBT003", # boolean-positional-value-in-call
 ]
 
 [tool.ruff.lint.flake8-builtins]
