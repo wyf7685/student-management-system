@@ -1,4 +1,5 @@
 from PyQt6.QtWidgets import (
+    QDialog,
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
@@ -7,36 +8,39 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QPushButton,
     QVBoxLayout,
+    QWidget,
 )
 
 from database.manager import DBManager
-from ui.common.page import BasePage
 from utils import check
 
 
-class AccountPage(BasePage):
-    button_name = "账号管理"
+class PasswordDialog(QDialog):
+    def __init__(self, parent: QWidget, role: str, user_id: str) -> None:
+        super().__init__(parent)
+        self.role = role
+        self.user_id = user_id
+
+        self.setWindowTitle("修改密码")
+        self.setFixedSize(200, 150)
+        self.init_ui()
 
     def init_ui(self) -> None:
-        layout_h = QHBoxLayout()
-        layout_v = QVBoxLayout()
-        central_box = QGroupBox("账号管理")
-        layout_v.addSpacing(60)
-        layout_v.addWidget(central_box)
-        layout_v.addSpacing(60)
-        layout_h.addSpacing(90)
-        layout_h.addLayout(layout_v)
-        layout_h.addSpacing(90)
-        self.setLayout(layout_h)
-
-        box_layout = QVBoxLayout()
-        central_box.setLayout(box_layout)
+        layout = QVBoxLayout()
+        box = QGroupBox("账号管理")
         form = QFormLayout()
-        box_layout.addLayout(form)
+        box.setLayout(form)
+        layout.addWidget(box)
+        self.setLayout(layout)
 
-        student_id = int(self.get_user_id())
-        form.addRow("身份:", QLabel("学生"))
-        form.addRow("学号:", QLabel(str(student_id)))
+        role_name = {
+            "Admin": "管理员",
+            "Teacher": "教师",
+            "Student": "学生",
+        }[self.role]
+
+        form.addRow("身份:", QLabel(role_name))
+        form.addRow("学号:", QLabel(self.user_id))
         self.password_edit = QLineEdit()
         self.password_edit.setEchoMode(QLineEdit.EchoMode.Password)
         form.addRow("密码:", self.password_edit)
@@ -46,7 +50,7 @@ class AccountPage(BasePage):
         self.confirm_btn = QPushButton("确认修改")
         self.confirm_btn.clicked.connect(self.confirm_edit_password)
         btn_layout.addWidget(self.confirm_btn)
-        box_layout.addLayout(btn_layout)
+        layout.addLayout(btn_layout)
 
     def confirm_edit_password(self):
         password = self.password_edit.text()
@@ -56,11 +60,16 @@ class AccountPage(BasePage):
 
         try:
             db = DBManager.system_account()
-            account = check(db.find_account("Student", self.get_user_id()))
+            account = check(db.find_account(self.role, self.user_id))
             db.update_account(account.id, password=password)
         except Exception as e:
             QMessageBox.critical(self, "错误", str(e))
         else:
             QMessageBox.information(self, "成功", "密码修改成功")
+            self.close()
         finally:
             self.password_edit.clear()
+
+    @classmethod
+    def as_slot(cls, parent: QWidget, role: str, user_id: str):
+        return lambda: cls(parent, role, user_id).exec()

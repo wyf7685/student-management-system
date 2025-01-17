@@ -94,11 +94,8 @@ class BaseUserWindow(QMainWindow):
         main_layout.addWidget(self.stack)
 
         # 创建底部按钮区域
-        button_widget = QWidget()
-        button_layout = QHBoxLayout(button_widget)
-        button_layout.setSpacing(10)
-        self.button_layout = button_layout
-        main_layout.addWidget(button_widget)
+        self.button_widget = QWidget()
+        main_layout.addWidget(self.button_widget)
 
         # 添加各功能页面
         self.init_pages()
@@ -111,23 +108,30 @@ class BaseUserWindow(QMainWindow):
     def add_stack_widget(self, widget: QWidget):
         self.stack.addWidget(widget)
 
-    def init_pages(self):
-        def slot(i):
-            return lambda *_: self.switch_page(i)
+    def _page_btn_slot(self, index: int):
+        return lambda *_: self.switch_page(index)
 
-        def btn(text: str):
-            btn = QPushButton(text)
-            btn.setMinimumWidth(100)
-            btn.setStyleSheet(BUTTON_STYLESHEET)
-            self.button_layout.addWidget(btn)
-            return btn
+    def _create_btn(self, text: str):
+        btn = QPushButton(text)
+        btn.setMinimumWidth(100)
+        btn.setStyleSheet(BUTTON_STYLESHEET)
+        return btn
+
+    def init_pages(self):
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(15)
+        self.button_widget.setLayout(button_layout)
 
         for idx, page in enumerate(self.page_cls):
             p = page(self)
-            btn(p.button_name).clicked.connect(slot(idx))
             self.add_stack_widget(p)
+            btn = self._create_btn(p.button_name)
+            btn.clicked.connect(self._page_btn_slot(idx))
+            button_layout.addWidget(btn)
 
-        btn("退出登录").clicked.connect(self.handle_logout)
+        btn = self._create_btn("退出登录")
+        btn.clicked.connect(self.handle_logout)
+        button_layout.addWidget(btn)
 
         self.switch_page(0)
 
