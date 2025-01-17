@@ -1,5 +1,6 @@
+# file:d:\student-management-system\src\ui\teacher\pages\course.py
 from PyQt6.QtCore import QPoint, Qt
-from PyQt6.QtGui import QAction, QFont
+from PyQt6.QtGui import QAction, QColor, QFont
 from PyQt6.QtWidgets import (
     QComboBox,
     QDialog,
@@ -7,13 +8,14 @@ from PyQt6.QtWidgets import (
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
+    QHeaderView,
     QLabel,
     QLineEdit,
-    QListWidget,
-    QListWidgetItem,
     QMenu,
     QPushButton,
     QSpinBox,
+    QTableWidget,
+    QTableWidgetItem,
     QVBoxLayout,
 )
 
@@ -49,7 +51,7 @@ class SemesterDialog(QDialog):
     def get_semester(self) -> str:
         year = self.year_start.value()
         sem = self.semester.currentText()
-        return f"{year}-{year+1}-{sem}"
+        return f"{year}-{year + 1}-{sem}"
 
 
 class CoursePage(BasePage):
@@ -74,13 +76,28 @@ class CoursePage(BasePage):
         input_group_layout.addWidget(self.search_button)
         layout.addWidget(input_group_box)
 
-        # 添加社团信息列表
-        self.course_list = QListWidget()
-        self.course_list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.course_list.customContextMenuRequested.connect(
+        # 添加课程信息表格
+        self.course_table = QTableWidget()
+        self.course_table.setColumnCount(4)
+        self.course_table.setHorizontalHeaderLabels(
+            ["课程ID", "课程名称", "学期", "状态"]
+        )
+        self.course_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.course_table.customContextMenuRequested.connect(
             self.handle_list_context_menu
         )
-        layout.addWidget(self.course_list)
+        header = self.course_table.horizontalHeader()
+        if header is not None:
+            header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+            header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+            header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+            header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
+        layout.addWidget(self.course_table)
+
+        # 添加提示信息
+        self.hint_label = QLabel("右键开设课程，再次右键取消授课")
+        self.hint_label.setStyleSheet("color: gray; font-size: 10px;")
+        layout.addWidget(self.hint_label)
 
         self.search_button.clicked.connect(self.update_course_list)
         self.update_course_list()
@@ -98,33 +115,47 @@ class CoursePage(BasePage):
         }
         courses.sort(key=lambda c: (c.course_id not in teaching, c.course_id))
 
-        self.course_list.clear()
-        for course in courses:
-            sign = "◆" if course.course_id in teaching else "◇"
+        self.course_table.setRowCount(len(courses))
+        for row, course in enumerate(courses):
+            status = "正在授课" if course.course_id in teaching else "未授课"
             semester_info = (
-                f" ({teaching[course.course_id]})"
-                if course.course_id in teaching
-                else ""
+                teaching.get(course.course_id, "")
             )
-            item = QListWidgetItem(
-                f"{sign} {course.course_id} - {course.name}{semester_info}"
+
+            item_id = QTableWidgetItem(str(course.course_id))
+            item_id.setFont(QFont("Arial", 12))
+            self.course_table.setItem(row, 0, item_id)
+
+            item_name = QTableWidgetItem(course.name)
+            item_name.setFont(QFont("Arial", 12))
+            self.course_table.setItem(row, 1, item_name)
+
+            item_semester = QTableWidgetItem(semester_info)
+            item_semester.setFont(QFont("Arial", 12))
+            self.course_table.setItem(row, 2, item_semester)
+
+            item_status = QTableWidgetItem(status)
+            item_status.setFont(QFont("Arial", 12))
+            item_status.setForeground(
+                QColor("blue") if course.course_id in teaching else QColor("black")
             )
-            item.setFont(QFont("Arial", 12))
-            self.course_list.addItem(item)
+            self.course_table.setItem(row, 3, item_status)
 
         self.teaching = teaching
         self.courses = [c.course_id for c in courses]
 
     def handle_list_context_menu(self, pos: QPoint):
-        if not self.course_list.currentItem():
+        current_item = self.course_table.itemAt(pos)
+        if not current_item:
             return
 
-        course_id = self.courses[self.course_list.currentRow()]
+        row = current_item.row()
+        course_id = self.courses[row]
         if course_id not in self.teaching:
             menu = self.create_teach_ctx_menu(course_id)
         else:
             menu = self.create_stop_ctx_menu(course_id)
-        menu.exec(self.course_list.mapToGlobal(pos))
+        menu.exec(self.course_table.mapToGlobal(pos))
         self.update_course_list()
 
     def create_teach_ctx_menu(self, course_id: int):
