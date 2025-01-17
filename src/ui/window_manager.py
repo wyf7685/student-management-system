@@ -1,5 +1,17 @@
 from PyQt6.QtCore import QObject
 
+from .admin.window import AdminMainWindow
+from .common.user_window import BaseUserWindow
+from .login_window import LoginWindow
+from .student.window import StudentMainWindow
+from .teacher.window import TeacherMainWindow
+
+WINDOW_CLS: dict[str, type[BaseUserWindow]] = {
+    "Admin": AdminMainWindow,
+    "Student": StudentMainWindow,
+    "Teacher": TeacherMainWindow,
+}
+
 
 class WindowManager(QObject):
     def __init__(self):
@@ -7,8 +19,6 @@ class WindowManager(QObject):
         self.current_window = None
 
     def show_login(self):
-        from .login_window import LoginWindow
-
         if self.current_window:
             self.current_window.close()
 
@@ -17,7 +27,7 @@ class WindowManager(QObject):
         self.login_window.show()
         self.current_window = self.login_window
 
-    def show_main_window(self, role, user_id):
+    def show_main_window(self, role: str, user_id: str):
         if self.current_window:
             self.current_window.close()
 
@@ -25,12 +35,10 @@ class WindowManager(QObject):
             from .student.window import StudentMainWindow
 
             self.main_window = StudentMainWindow(user_id)
-
         elif role == "Admin":
             from .admin.window import AdminMainWindow
 
             self.main_window = AdminMainWindow(user_id)
-
         elif role == "Teacher":
             from .teacher.window import TeacherMainWindow
 

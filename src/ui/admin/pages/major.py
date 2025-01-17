@@ -8,7 +8,12 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from ..common import BaseConfirmDialog, BaseContextMenuHandler, check
+from ..common import (
+    BaseConfirmDialog,
+    BaseContextMenuHandler,
+    CollegeSelectionCombo,
+    check,
+)
 from ..controllers.major import MajorController
 from ..page import BasePage
 
@@ -23,13 +28,13 @@ class AddDialog(BaseConfirmDialog):
         # 创建控件
         self.id_input = QLineEdit()
         self.name_input = QLineEdit()
-        self.college_id_input = QLineEdit()
+        self.college_selection = CollegeSelectionCombo(self)
         self.name_input.setFixedWidth(200)
 
         # 添加到表单
         form_layout.addRow("专业代码:", self.id_input)
         form_layout.addRow("专业名称:", self.name_input)
-        form_layout.addRow("学院代码:", self.college_id_input)
+        form_layout.addRow("学院代码:", self.college_selection)
         layout.addLayout(form_layout)
 
     def get_major_id(self) -> str:
@@ -38,8 +43,8 @@ class AddDialog(BaseConfirmDialog):
     def get_major_name(self) -> str:
         return self.name_input.text().strip()
 
-    def get_college_id(self) -> str:
-        return self.college_id_input.text().strip()
+    def get_college_id(self) -> int:
+        return self.college_selection.get_selected()[0]
 
 
 class EditDialog(BaseConfirmDialog):
@@ -59,23 +64,22 @@ class EditDialog(BaseConfirmDialog):
         form_layout = QFormLayout()
         self.id_label = QLabel(self.major_id)
         self.name_input = QLineEdit()
-        self.college_id_input = QLineEdit()
+        self.college_selection = CollegeSelectionCombo(self, int(self.college_id))
         self.name_input.setFixedWidth(200)
 
         # 设置默认值
         self.name_input.setText(self.major_name)
-        self.college_id_input.setText(self.college_id)
 
         # 添加到表单
         form_layout.addRow("专业名称:", self.name_input)
-        form_layout.addRow("学院代码:", self.college_id_input)
+        form_layout.addRow("学院代码:", self.college_selection)
         layout.addLayout(form_layout)
 
     def get_new_name(self) -> str:
         return self.name_input.text().strip()
 
-    def get_new_college_id(self) -> str:
-        return self.college_id_input.text().strip()
+    def get_new_college_id(self) -> int:
+        return self.college_selection.get_selected()[0]
 
 
 class ContextMenuHandler(BaseContextMenuHandler[MajorController]):

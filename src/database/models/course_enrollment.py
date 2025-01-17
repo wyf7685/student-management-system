@@ -5,7 +5,7 @@ from sqlalchemy import CheckConstraint, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ..db_config import Base
-from .class_ import Class
+from .course import Course
 from .student import Student
 
 
@@ -31,7 +31,7 @@ type EnrollmentsStatusName = Literal[
     "选课失败",
 ]
 
-STUDENT_STATUS_NAME: dict[EnrollmentsStatusCode, EnrollmentsStatusName] = {
+COURSE_STATUS_NAME: dict[EnrollmentsStatusCode, EnrollmentsStatusName] = {
     EnrollmentsStatusCode.Enrolled: "已选修",
     EnrollmentsStatusCode.Completed: "已完成",
     EnrollmentsStatusCode.Dropped: "已放弃",
@@ -49,18 +49,18 @@ class CourseEnrollment(Base):
         ForeignKey(Student.student_id),
         primary_key=True,
     )
-    class_id: Mapped[int] = mapped_column(
+    course_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey(Class.class_id),
-        nullable=False,
+        ForeignKey(Course.course_id),
+        primary_key=True,
     )
     semester: Mapped[str] = mapped_column(String(50), nullable=False)
-    coures_status: Mapped[EnrollmentsStatusCode] = mapped_column(
+    course_status: Mapped[EnrollmentsStatusCode] = mapped_column(
         Integer,
-        CheckConstraint("coures_status IN (1, 2, 3, 4, 5, 6, 7, 8)"),
+        CheckConstraint("course_status IN (1, 2, 3, 4, 5, 6, 7, 8)"),
         nullable=False,
     )
 
     @property
-    def coures_status_name(self) -> EnrollmentsStatusName:
-        return STUDENT_STATUS_NAME[self.coures_status]
+    def course_status_name(self) -> EnrollmentsStatusName:
+        return COURSE_STATUS_NAME[self.course_status]

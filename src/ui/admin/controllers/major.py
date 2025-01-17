@@ -1,26 +1,25 @@
 from database import Major
 from database.manager import MajorDBManager
 
-from ._base import BaseController, check_college_id, check_major_id
+from ._base import BaseController, check_major_id
 
 
 class MajorController(BaseController[MajorDBManager]):
     dbm_factory = MajorDBManager
 
-    def add(self, major_id: str, name: str, college_id: str) -> bool:
+    def add(self, major_id: str, name: str, college_id: int) -> bool:
         try:
             # 验证数据
             if not name:
                 return self.error("专业名称不能为空")
             mid = check_major_id(major_id)
-            cid = check_college_id(college_id)
 
             # 检查是否已存在
             if self.db.exists_major(mid):
                 return self.error("专业代码已存在")
 
             # 创建并保存
-            major = Major(name=name, major_id=mid, college_id=cid)
+            major = Major(name=name, major_id=mid, college_id=college_id)
             self.db.add_major(major)
 
             # 发送信号
@@ -29,15 +28,14 @@ class MajorController(BaseController[MajorDBManager]):
         except Exception as err:
             return self.error(str(err))
 
-    def update(self, major_id: str, name: str, college_id: str) -> bool:
+    def update(self, major_id: str, name: str, college_id: int) -> bool:
         major = None
         try:
             mid = check_major_id(major_id)
             if name:
                 major = self.db.update_major(mid, name=name)
             if college_id:
-                cid = check_college_id(college_id)
-                major = self.db.update_major(mid, college_id=cid)
+                major = self.db.update_major(mid, college_id=college_id)
             if major is None:
                 return self.error("专业信息未更新")
 

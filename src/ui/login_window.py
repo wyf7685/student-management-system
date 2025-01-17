@@ -18,8 +18,8 @@ from config import LastLogin, config
 from database import DBManager
 from utils import check
 
-from .dialog.about import AboutWindow
-from .dialog.settings import SettingsWindow
+from .dialog.about import AboutDialog
+from .dialog.settings import SettingsDialog
 
 ROLE_CONVERT = {
     "管理员": "Admin",
@@ -101,12 +101,14 @@ class LoginWindow(QMainWindow):
         # 文件菜单
         file_menu = check(self.menubar.addMenu("文件"))
         settings_action = check(file_menu.addAction("设置"))
-        settings_action.triggered.connect(lambda: SettingsWindow(self).exec())
+        settings_action.triggered.connect(lambda: SettingsDialog(self).exec())
+        exit_action = check(file_menu.addAction("退出"))
+        exit_action.triggered.connect(self.close)
 
         # 帮助菜单
         help_menu = check(self.menubar.addMenu("帮助"))
         about_action = check(help_menu.addAction("关于"))
-        about_action.triggered.connect(lambda: AboutWindow(self).exec())
+        about_action.triggered.connect(lambda: AboutDialog(self).exec())
 
     def handle_login(self):
         role = ROLE_CONVERT[self.role_combo.currentText()]

@@ -1,10 +1,10 @@
 from database import Class
 from database.manager import ClassDBManager
+from utils import check
 
 from ._base import (
     BaseController,
     check_class_id,
-    check_major_id,
     make_checker,
 )
 
@@ -18,7 +18,7 @@ class ClassController(BaseController[ClassDBManager]):
         self,
         class_id: str,
         name: str,
-        major_id: str,
+        major_id: int,
         year: str,
     ) -> bool:
         try:
@@ -26,7 +26,6 @@ class ClassController(BaseController[ClassDBManager]):
             if not name:
                 return self.error("班级名称不能为空")
             cid = check_class_id(class_id)
-            mid = check_major_id(major_id)
             y = check_year(year)
 
             # 检查是否已存在
@@ -34,12 +33,7 @@ class ClassController(BaseController[ClassDBManager]):
                 return self.error("班级代码已存在")
 
             # 创建并保存
-            class_ = Class(
-                name=name,
-                class_id=cid,
-                major_id=mid,
-                year=y,
-            )
+            class_ = Class(name=name, class_id=cid, major_id=major_id, year=y)
             self.db.add_class(class_)
 
             # 发送信号
@@ -52,23 +46,23 @@ class ClassController(BaseController[ClassDBManager]):
         self,
         class_id: str,
         name: str,
-        major_id: str,
+        major_id: int,
         year: str,
     ) -> bool:
         class_ = None
         try:
             cid = check_class_id(class_id)
+            kwds = {}
             if name:
-                class_ = self.db.update_class(cid, name=name)
+                kwds["name"] = name
             if major_id:
-                mid = check_major_id(major_id)
-                class_ = self.db.update_class(cid, major_id=mid)
+                kwds["major_id"] = major_id
             if year:
-                y = check_year(year)
-                class_ = self.db.update_class(cid, year=y)
-            if class_ is None:
+                kwds["year"] = check_year(year)
+            if not kwds:
                 return self.error("班级信息未更新")
 
+            class_ = self.db.update_class(cid, **kwds)
             self.updated.emit(class_)
             return self.success("班级信息更新成功")
         except Exception as err:
@@ -92,6 +86,9 @@ class ClassController(BaseController[ClassDBManager]):
             self.error(str(err))
             return None
 
-    def get_all(self) -> list[Class]:
+    def get_all(self):
         """获取所有班级信息"""
-        return self.db.get_all_classes()
+        mdb = self.db.major()
+        for c in self.db.get_all_classes():
+            m = check(mdb.get_major(c.major_id))
+            yield (c.class_id, c.name, m.name, c.year)

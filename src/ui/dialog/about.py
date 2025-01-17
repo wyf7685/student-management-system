@@ -3,7 +3,6 @@ from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
     QDialog,
     QFrame,
-    QHBoxLayout,
     QLabel,
     QPushButton,
     QVBoxLayout,
@@ -13,11 +12,11 @@ from PyQt6.QtWidgets import (
 from const import AUTHORS, COPYRIGHT, VERSION
 
 
-class AboutWindow(QDialog):
+class AboutDialog(QDialog):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.setWindowTitle("关于")
-        self.setFixedSize(400, 300)
+        self.setFixedSize(300, 400)
 
         # 创建主布局
         layout = QVBoxLayout()
@@ -48,19 +47,14 @@ class AboutWindow(QDialog):
 
         # 添加作者信息容器
         authors_container = QWidget()
-        authors_layout = QHBoxLayout(authors_container)
+        authors_layout = QVBoxLayout(authors_container)
         authors_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(authors_container)
 
-        for idx, (name, email) in enumerate(AUTHORS):
+        for name, email in AUTHORS:
             author_label = QLabel(f"{name}\n{email}")
             author_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             authors_layout.addWidget(author_label)
-            # 在作者之间添加分隔符，最后一个作者除外
-            if idx < len(AUTHORS) - 1:
-                separator = QLabel("|")
-                separator.setStyleSheet("color: #999;")
-                authors_layout.addWidget(separator)
 
         # 添加分割线
         line = QFrame()

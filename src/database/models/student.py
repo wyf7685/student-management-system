@@ -1,13 +1,22 @@
 import datetime
 from typing import Literal
 
-from sqlalchemy import CheckConstraint, Date, DateTime, ForeignKey, Integer, String
+from sqlalchemy import (
+    CheckConstraint,
+    Date,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ..db_config import Base
 from .class_ import Class
 from .college import College
 from .major import Major
+
+PHONE_CHECK = "1" + "_" * 10
 
 
 class Student(Base):
@@ -19,8 +28,16 @@ class Student(Base):
         nullable=False,
     )
     birth: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False)
-    phone: Mapped[str] = mapped_column(String(20), nullable=False)
-    email: Mapped[str] = mapped_column(String(100), nullable=False)
+    phone: Mapped[str] = mapped_column(
+        String(20),
+        CheckConstraint(f"phone LIKE '{PHONE_CHECK}'"),
+        nullable=False,
+    )
+    email: Mapped[str] = mapped_column(
+        String(100),
+        CheckConstraint("email LIKE '%@%.%'"),
+        nullable=False,
+    )
     college_id: Mapped[int] = mapped_column(
         Integer,
         ForeignKey(College.college_id),

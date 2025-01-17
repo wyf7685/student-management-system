@@ -14,10 +14,11 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from const import BUTTON_STYLESHEET
 from utils import check
 
-from ..dialog.about import AboutWindow
-from ..dialog.settings import SettingsWindow
+from ..dialog.about import AboutDialog
+from ..dialog.settings import SettingsDialog
 
 if TYPE_CHECKING:
     from .page import BasePage
@@ -45,14 +46,14 @@ class BaseUserWindow(QMainWindow):
         # 文件菜单
         file_menu = check(self.menubar.addMenu("文件"))
         settings_action = check(file_menu.addAction("设置"))
-        settings_action.triggered.connect(lambda: SettingsWindow(self).exec())
+        settings_action.triggered.connect(lambda: SettingsDialog(self).exec())
         action = check(file_menu.addAction("退出登录"))
         action.triggered.connect(self.handle_logout)
 
         # 帮助菜单
         help_menu = check(self.menubar.addMenu("帮助"))
         about_action = check(help_menu.addAction("关于"))
-        about_action.triggered.connect(lambda: AboutWindow(self).exec())
+        about_action.triggered.connect(lambda: AboutDialog(self).exec())
 
     def create_status_bar(self) -> None:
         self.status_bar = check(self.statusBar())
@@ -107,6 +108,9 @@ class BaseUserWindow(QMainWindow):
         self.setStatusBar(status_bar)
         status_bar.showMessage(f"当前用户: {self.user_id}")
 
+    def add_stack_widget(self, widget: QWidget):
+        self.stack.addWidget(widget)
+
     def init_pages(self):
         def slot(i):
             return lambda *_: self.switch_page(i)
@@ -114,24 +118,14 @@ class BaseUserWindow(QMainWindow):
         def btn(text: str):
             btn = QPushButton(text)
             btn.setMinimumWidth(100)
-            btn.setStyleSheet("""
-                QPushButton {
-                    padding: 8px;
-                    background-color: #4a90e2;
-                    color: white;
-                    border-radius: 4px;
-                }
-                QPushButton:hover {
-                    background-color: #357abd;
-                }
-            """)
+            btn.setStyleSheet(BUTTON_STYLESHEET)
             self.button_layout.addWidget(btn)
             return btn
 
         for idx, page in enumerate(self.page_cls):
             p = page(self)
             btn(p.button_name).clicked.connect(slot(idx))
-            self.stack.addWidget(p)
+            self.add_stack_widget(p)
 
         btn("退出登录").clicked.connect(self.handle_logout)
 
