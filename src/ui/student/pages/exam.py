@@ -1,8 +1,7 @@
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QLabel, QTableWidget, QTableWidgetItem, QVBoxLayout
+from PyQt6.QtWidgets import QTableWidget, QTableWidgetItem, QVBoxLayout
 
 from database.manager import DBManager
-from ui.common.page import BasePage
+from ui.common.page import BasePage, PageTitle
 from utils import check
 
 
@@ -12,11 +11,7 @@ class ExamPage(BasePage):
     def init_ui(self):
         # 创建一个垂直布局
         layout = QVBoxLayout()
-
-        title_label = QLabel("考试查询")
-        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
-        layout.addWidget(title_label)
+        layout.addWidget(PageTitle("考试查询"))
 
         # 创建一个 QTableWidget
         labels = ["考试ID", "课程名称", "时间", "持续时间", "名称", "描述", "地点"]

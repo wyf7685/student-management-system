@@ -66,20 +66,24 @@ WHERE NOT EXISTS (
     WHERE role = 'Teacher' AND teacher_id = 1001
 );
 
-INSERT INTO system_account (
-    role, password, salt, student_id, teacher_id, admin_id
-)
-SELECT 
-    'Admin', 
-    '697d423a3558f0ab2e71cea50014029628ee62cd154e1e81d5cd960932cce9b6',
-    'default',
-    NULL,
-    NULL,
-    'admin'
-WHERE NOT EXISTS (
-    SELECT 1 FROM system_account 
-    WHERE role = 'Admin' AND admin_id = 'admin'
-);
+-- 默认管理员账号固定为 admin/admin
+-- 
+-- INSERT INTO system_account (
+--     role, password, salt, student_id, teacher_id, admin_id
+-- )
+-- SELECT 
+--     'Admin', 
+--     '697d423a3558f0ab2e71cea50014029628ee62cd154e1e81d5cd960932cce9b6',
+--     'default',
+--     NULL,
+--     NULL,
+--     'admin'
+-- WHERE NOT EXISTS (
+--     SELECT 1 FROM system_account 
+--     WHERE role = 'Admin' AND admin_id = 'admin'
+-- );
+
+
 -- 插入奖项信息
 INSERT INTO award (award_id, student_id, award_name, award_date)
 SELECT 1, 1111, '全国大学生程序设计竞赛一等奖', '2023-10-01'

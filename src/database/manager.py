@@ -309,6 +309,10 @@ class CourseDBManager(DBManager):
     def exists_course(self, course_id: int):
         return self.session.query(Course).filter_by(course_id=course_id).count() > 0
 
+    def search_course(self, keyword: str):
+        like = f"%{keyword}%"
+        return self.session.query(Course).filter(Course.name.like(like)).all()
+
     def add_course(self, course: Course):
         if self.exists_course(course.course_id):
             raise ValueError("课程代码已存在")
@@ -829,11 +833,14 @@ class CourseTeacherDBManager(DBManager):
             > 0
         )
 
-    def add_course_teacher(self, course_teacher: CourseTeacher):
-        if self.exists_course_teacher(
-            course_teacher.course_id, course_teacher.tearcher_id
-        ):
+    def add_course_teacher(self, course_id: int, teacher_id: int, semester: str):
+        if self.exists_course_teacher(course_id, teacher_id):
             raise ValueError("课程教师关系已存在")
+        course_teacher = CourseTeacher(
+            course_id=course_id,
+            tearcher_id=teacher_id,
+            semester=semester
+        )
         self.session.add(course_teacher)
         self.session.commit()
 

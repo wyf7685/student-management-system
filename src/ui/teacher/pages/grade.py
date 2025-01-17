@@ -1,4 +1,3 @@
-from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QDialog,
     QFormLayout,
@@ -15,7 +14,7 @@ from PyQt6.QtWidgets import (
 
 from database.manager import DBManager
 from ui.admin.common import BaseConfirmDialog
-from ui.common.page import BasePage
+from ui.common.page import BasePage, PageTitle
 from ui.common.selection import SelectionCombo
 
 
@@ -51,31 +50,23 @@ class GradePage(BasePage):
     button_name = "学生评分"
 
     def init_ui(self) -> None:
-        self.teacher_id = int(self.get_user_id())
-
         layout = QVBoxLayout()
 
         # 添加标题
-        title_label = QLabel("学生评分")
-        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
-        layout.addWidget(title_label)
+        layout.addWidget(PageTitle("学生评分"))
 
         # 课程选择
         course_box = QHBoxLayout()
         course_box.addStretch()
         course_label = QLabel("选择课程：")
-        self.course_combo = SelectionCombo(
-            self,
-            [
-                (c.course_id, c.name)
-                for c in DBManager.course().get_courses_by_teacher(self.teacher_id)
-            ],
-            formatter=lambda c: f"{c[0]} - {c[1]}",
-        )
-        self.course_combo.currentIndexChanged.connect(self.update_table)
         course_box.addWidget(course_label)
-        course_box.addWidget(self.course_combo)
+        self.course_combo_layout = QHBoxLayout()
+        self.course_combo = self.create_course_combo()
+        self.course_combo_layout.addWidget(self.course_combo)
+        course_box.addLayout(self.course_combo_layout)
+        refresh_course_button = QPushButton("刷新")
+        refresh_course_button.clicked.connect(self.refresh_course_combo)
+        course_box.addWidget(refresh_course_button)
         layout.addLayout(course_box)
 
         # 成绩表格
@@ -87,6 +78,25 @@ class GradePage(BasePage):
         layout.addWidget(self.table)
 
         self.setLayout(layout)
+        self.update_table()
+
+    def create_course_combo(self):
+        teacher_id = int(self.get_user_id())
+        combo = SelectionCombo(
+            self,
+            [
+                (c.course_id, c.name)
+                for c in DBManager.course().get_courses_by_teacher(teacher_id)
+            ],
+            formatter=lambda c: f"{c[0]} - {c[1]}",
+        )
+        combo.currentIndexChanged.connect(self.update_table)
+        return combo
+
+    def refresh_course_combo(self):
+        self.course_combo_layout.removeWidget(self.course_combo)
+        self.course_combo = self.create_course_combo()
+        self.course_combo_layout.addWidget(self.course_combo)
         self.update_table()
 
     def update_table(self):
