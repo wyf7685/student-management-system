@@ -99,13 +99,14 @@ class SettingsDialog(QDialog):
 
     def on_db_type_changed(self, db_type):
         """处理数据库类型变更"""
+        if db_type == "SQLite":
+            self.sqlite_path.setText("db.sqlite")
+        else:
+            self.host_edit.setText("localhost")
+            self.port_edit.setText("3306" if db_type == "MySQL" else "5432")
+
         self.load_settings()
         self.switch_sqlite_visible(visible=db_type == "SQLite")
-
-        if db_type != "SQLite":
-            # 设置默认端口
-            default_port = "3306" if db_type == "MySQL" else "5432"
-            self.port_edit.setText(default_port)
 
     def browse_sqlite_file(self):
         """选择SQLite数据库文件"""

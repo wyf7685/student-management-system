@@ -82,13 +82,15 @@ class InfoPage(BasePage):
 
         # 初始化学生信息
         self.load_student_info()
-        self.on_line_edit_updated()
 
     def on_line_edit_updated(self):
         enabled = (
             self.phone_edit.text().strip() != self.phone
             or self.email_edit.text().strip() != self.email
         )
+        self.set_btn_status(enabled)
+
+    def set_btn_status(self, enabled: bool):
         self.confirm_btn.setEnabled(enabled)
         self.cancel_btn.setEnabled(enabled)
 
@@ -110,6 +112,7 @@ class InfoPage(BasePage):
             QMessageBox.information(self, "成功", "修改成功")
             self.phone = phone
             self.email = email
+            self.set_btn_status(False)
 
     def load_student_info(self):
         # 查询学生信息
@@ -131,3 +134,5 @@ class InfoPage(BasePage):
         self.major_edit.setText(major.name)
         self.class_edit.setText(class_.name)
         self.enrollment_date_edit.setText(student.enrollment_date.strftime("%Y-%m-%d"))
+
+        self.set_btn_status(False)
