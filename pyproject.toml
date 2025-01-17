@@ -1,7 +1,7 @@
 [project]
 name = "student-management-system"
 version = "0.1.0"
-description = "Add your description here"
+description = "学生信息管理系统"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
