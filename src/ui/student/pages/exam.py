@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QLabel, QTableWidget, QTableWidgetItem, QVBoxLayout
 
 from database.manager import DBManager
 from ui.common.page import BasePage
+from utils import check
 
 
 class ExamPage(BasePage):
@@ -18,29 +19,34 @@ class ExamPage(BasePage):
         layout.addWidget(title_label)
 
         # 创建一个 QTableWidget
+        labels = ["考试ID", "课程名称", "时间", "持续时间", "名称", "描述", "地点"]
         self.table_widget = QTableWidget()
-        self.table_widget.setColumnCount(6)
-        self.table_widget.setHorizontalHeaderLabels(
-            ["考试ID", "课程ID", "时间", "持续时间", "名称", "描述", "地点"]
-        )
+        self.table_widget.setColumnCount(len(labels))
+        self.table_widget.setHorizontalHeaderLabels(labels)
 
         # 获取考试信息
-        exams = DBManager.exam().get_all_exams()
+        exams = DBManager.exam().get_exam_by_student_id(int(self.get_user_id()))
+        cdb = DBManager.course()
+        courses = {
+            exam.course_id: check(cdb.get_course(exam.course_id)).name for exam in exams
+        }
 
         # 设置表格的行数
         self.table_widget.setRowCount(len(exams))
 
         # 填充表格数据
         for row, exam in enumerate(exams):
-            self.table_widget.setItem(row, 0, QTableWidgetItem(str(exam.exam_id)))
-            self.table_widget.setItem(row, 1, QTableWidgetItem(str(exam.course_id)))
-            self.table_widget.setItem(
-                row, 2, QTableWidgetItem(exam.time.strftime("%Y-%m-%d %H:%M:%S"))
+            data = (
+                exam.exam_id,
+                courses[exam.course_id],
+                exam.time.strftime("%Y-%m-%d %H:%M:%S"),
+                exam.duration,
+                exam.name,
+                exam.description,
+                exam.location,
             )
-            self.table_widget.setItem(row, 3, QTableWidgetItem(str(exam.duration)))
-            self.table_widget.setItem(row, 4, QTableWidgetItem(exam.name))
-            self.table_widget.setItem(row, 5, QTableWidgetItem(exam.description))
-            self.table_widget.setItem(row, 6, QTableWidgetItem(exam.location))
+            for col, item in enumerate(data):
+                self.table_widget.setItem(row, col, QTableWidgetItem(str(item)))
 
         # 将表格添加到布局中
         layout.addWidget(self.table_widget)

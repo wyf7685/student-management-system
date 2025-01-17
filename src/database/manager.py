@@ -97,6 +97,10 @@ class DBManager:
     def course_teacher(cls):
         return CourseTeacherDBManager()
 
+    @classmethod
+    def course_enrollment(cls):
+        return CourseEnrollmentDBManager()
+
 
 class CollegeDBManager(DBManager):
     def get_college(self, college_id: int) -> College | None:

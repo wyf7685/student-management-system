@@ -35,38 +35,14 @@ class CoursePage(BasePage):
         self.load_courses()
 
     def load_courses(self):
-        student_id = self.get_user_id()  # 假设 self.user_id 存储了当前学生的学号
-
-        # 确保 student_id 是整数
-        if not isinstance(student_id, int):
-            try:
-                student_id = int(student_id)
-            except ValueError:
-                self.courses_list.clear()
-                self.courses_list.addItem("学号格式不正确")
-                return
-
-        # 查询学生信息
-        student = check(DBManager.student().get_student(student_id))
-        if not student:
-            self.courses_list.clear()
-            self.courses_list.addItem("学生不存在")
-            return
-
-        # 查询班级信息
-        class_ = check(DBManager.class_().get_class(student.class_id))
-        if not class_:
-            self.courses_list.clear()
-            self.courses_list.addItem("班级不存在")
-            return
-
-        # 假设我们有一个方法来获取班级的课程列表
-        # 这里为了简化示例，直接查询所有课程
-        courses = check(DBManager.course().get_all_courses())
+        student_id = int(self.get_user_id())
+        enrollments = DBManager.course_enrollment().get_student_enrollments(student_id)
+        cdb = DBManager.course()
 
         self.courses_list.clear()
-        if courses:
-            for course in courses:
+        if enrollments:
+            for enrollment in enrollments:
+                course = check(cdb.get_course(enrollment.course_id))
                 item_text = f"课程名称: {course.name}, 学分: {course.credits}"
                 item = QListWidgetItem(item_text)
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
