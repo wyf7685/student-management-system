@@ -51,8 +51,7 @@ class GradePage(BasePage):
     button_name = "学生评分"
 
     def init_ui(self) -> None:
-        self.teacher_id = int(self.get_user_id())
-
+        teacher_id = int(self.get_user_id())
         layout = QVBoxLayout()
 
         # 添加标题
@@ -69,7 +68,7 @@ class GradePage(BasePage):
             self,
             [
                 (c.course_id, c.name)
-                for c in DBManager.course().get_courses_by_teacher(self.teacher_id)
+                for c in DBManager.course().get_courses_by_teacher(teacher_id)
             ],
             formatter=lambda c: f"{c[0]} - {c[1]}",
         )
