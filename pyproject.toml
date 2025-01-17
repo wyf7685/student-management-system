@@ -11,7 +11,7 @@ dependencies = [
 ]
 
 [tool.ruff]
-line-length = 88
+line-length = 100
 target-version = "py313"
 
 [tool.ruff.format]
@@ -35,32 +35,32 @@ select = [
     "TRY",   # tryceratops
     "ASYNC", # flake8-async
     "S",     # flake8-bandit
-    "FBT",   # flake8-boolean-trap
-    "A",     # flake8-builtins
-    "B",     # flake8-bugbear
-    "COM",   # flake8-commas
-    "C4",    # flake8-comprehensions
-    "DTZ",   # flake8-datetimez
-    "T10",   # flake8-debugger
-    "EM",    # flake8-errmsg
-    "FA",    # flake8-future-annotations
-    "ISC",   # flake8-implicit-str-concat
-    "ICN",   # flake8-import-conventions
-    "PIE",   # flake8-pie
-    "T20",   # flake8-print
-    "PYI",   # flake8-pyi
-    "PT",    # flake8-pytest-style
-    "Q",     # flake8-quotes
-    "RSE",   # flake8-raise
-    "RET",   # flake8-return
-    "SLF",   # flake8-self
-    "SIM",   # flake8-simplify
-    "SLOT",  # flake8-slots
-    "TID",   # flake8-tidy-imports
-    "ARG",   # flake8-unused-arguments
-    "PTH",   # flake8-use-pathlib
-    "TCH",   # flake8-type-checking
-    "YTT",   # flake8-2020
+    # "FBT",   # flake8-boolean-trap
+    "A",    # flake8-builtins
+    "B",    # flake8-bugbear
+    "COM",  # flake8-commas
+    "C4",   # flake8-comprehensions
+    "DTZ",  # flake8-datetimez
+    "T10",  # flake8-debugger
+    "EM",   # flake8-errmsg
+    "FA",   # flake8-future-annotations
+    "ISC",  # flake8-implicit-str-concat
+    "ICN",  # flake8-import-conventions
+    "PIE",  # flake8-pie
+    "T20",  # flake8-print
+    "PYI",  # flake8-pyi
+    "PT",   # flake8-pytest-style
+    "Q",    # flake8-quotes
+    "RSE",  # flake8-raise
+    "RET",  # flake8-return
+    "SLF",  # flake8-self
+    "SIM",  # flake8-simplify
+    "SLOT", # flake8-slots
+    "TID",  # flake8-tidy-imports
+    "ARG",  # flake8-unused-arguments
+    "PTH",  # flake8-use-pathlib
+    "TCH",  # flake8-type-checking
+    "YTT",  # flake8-2020
 ]
 ignore = [
     "E402",   # module-import-not-at-top-of-file
@@ -104,6 +104,4 @@ reportShadowedImports = false
 disableBytesTypePromotions = true
 
 [dependency-groups]
-dev = [
-    "pyinstaller>=6.11.1",
-]
+dev = ["pyinstaller>=6.11.1"]

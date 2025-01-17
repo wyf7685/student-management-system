@@ -22,8 +22,8 @@ if TYPE_CHECKING:
     from PyQt6.QtGui import QAction
 
 
-class _ContextMenuHandlerParentTab[C](Protocol):
-    table: QTableWidget
+class _ContextMenuHandlerParentTab[C, T: QTableWidget = QTableWidget](Protocol):
+    table: T
     controller: C
 
 

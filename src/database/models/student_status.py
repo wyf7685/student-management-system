@@ -27,6 +27,7 @@ STUDENT_STATUS_NAME: dict[StudentStatusCode, StudentStatusName] = {
     StudentStatusCode.DROPPED: "退学",
 }
 
+
 class StudentStatus(Base):
     student_id: Mapped[int] = mapped_column(
         Integer,

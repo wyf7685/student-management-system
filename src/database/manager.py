@@ -444,9 +444,7 @@ class GradeDBManager(DBManager):
 
     def exists_grade(self, student_id: int, course_id: int) -> bool:
         return (
-            self.session.query(Grade)
-            .filter_by(student_id=student_id, course_id=course_id)
-            .count()
+            self.session.query(Grade).filter_by(student_id=student_id, course_id=course_id).count()
             > 0
         )
 
@@ -701,12 +699,7 @@ class ScholarshipDBManager(DBManager):
         return self.session.query(Scholarship).filter_by(student_id=student_id).all()
 
     def exists_scholarship(self, scholarship_id: int) -> bool:
-        return (
-            self.session.query(Scholarship)
-            .filter_by(scholarship_id=scholarship_id)
-            .count()
-            > 0
-        )
+        return self.session.query(Scholarship).filter_by(scholarship_id=scholarship_id).count() > 0
 
     def add_scholarship(self, scholarship: Scholarship):
         if self.exists_scholarship(scholarship.scholarship_id):
@@ -803,9 +796,7 @@ class TeacherDBManager(DBManager):
 
 
 class CourseTeacherDBManager(DBManager):
-    def get_course_teacher(
-        self, course_id: int, teacher_id: int
-    ) -> CourseTeacher | None:
+    def get_course_teacher(self, course_id: int, teacher_id: int) -> CourseTeacher | None:
         return (
             self.session.query(CourseTeacher)
             .filter_by(course_id=course_id, tearcher_id=teacher_id)
@@ -836,9 +827,7 @@ class CourseTeacherDBManager(DBManager):
         if self.exists_course_teacher(course_id, teacher_id):
             raise ValueError("课程教师关系已存在")
         course_teacher = CourseTeacher(
-            course_id=course_id,
-            tearcher_id=teacher_id,
-            semester=semester
+            course_id=course_id, tearcher_id=teacher_id, semester=semester
         )
         self.session.add(course_teacher)
         self.session.commit()
@@ -869,9 +858,7 @@ class CourseTeacherDBManager(DBManager):
 
 
 class CourseEnrollmentDBManager(DBManager):
-    def get_enrollment(
-        self, student_id: int, course_id: int
-    ) -> CourseEnrollment | None:
+    def get_enrollment(self, student_id: int, course_id: int) -> CourseEnrollment | None:
         return (
             self.session.query(CourseEnrollment)
             .filter_by(student_id=student_id, course_id=course_id)
@@ -882,9 +869,7 @@ class CourseEnrollmentDBManager(DBManager):
         return self.session.query(CourseEnrollment).all()
 
     def get_student_enrollments(self, student_id: int):
-        return (
-            self.session.query(CourseEnrollment).filter_by(student_id=student_id).all()
-        )
+        return self.session.query(CourseEnrollment).filter_by(student_id=student_id).all()
 
     def get_course_enrollments(self, course_id: int):
         return self.session.query(CourseEnrollment).filter_by(course_id=course_id).all()
@@ -893,9 +878,7 @@ class CourseEnrollmentDBManager(DBManager):
         return self.session.query(CourseEnrollment).filter_by(semester=semester).all()
 
     def get_by_status(self, status: EnrollmentsStatusCode):
-        return (
-            self.session.query(CourseEnrollment).filter_by(course_status=status).all()
-        )
+        return self.session.query(CourseEnrollment).filter_by(course_status=status).all()
 
     def get_detail(self, enrollment: CourseEnrollment):
         data = (

@@ -137,7 +137,7 @@ class ContextMenuHandler(BaseContextMenuHandler[ClassController]):
 class ClassPage(BasePage[ClassController]):
     button_name = "班级"
     handler_cls = ContextMenuHandler
-    columns = "班级代码", "班级名称", "专业名称", "年级"
+    columns = "班级代码", "班级名称", "专业代码", "专业名称", "年级"
     controller_cls = ClassController
 
     def iterate_table_data(self):

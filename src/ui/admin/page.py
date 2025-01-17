@@ -14,6 +14,7 @@ from PyQt6.QtWidgets import (
 )
 
 from ui.common.page import BasePage as _BasePage
+from ui.common.readonly_table import ReadonlyTableWidget
 
 from .common import BaseContextMenuHandler
 from .controllers._base import BaseController
@@ -37,9 +38,7 @@ class BasePage[C: BaseController](_BasePage):
         title_layout = QHBoxLayout()
         title_label = QLabel(f"{self.button_name}列表")
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setStyleSheet(
-            "font-size: 14px; font-weight: bold; margin-bottom: 10px;"
-        )
+        title_label.setStyleSheet("font-size: 14px; font-weight: bold; margin-bottom: 10px;")
         refresh_btn = QPushButton()
         refresh_btn.setText("刷新")
         refresh_btn.setFixedSize(72, 24)
@@ -57,17 +56,12 @@ class BasePage[C: BaseController](_BasePage):
         self.setLayout(self._layout)
 
     def setup_table(self):
-        table = QTableWidget()
-        table.setColumnCount(len(self.columns))
-        table.setHorizontalHeaderLabels(self.columns)
+        table = ReadonlyTableWidget(self.columns)
         table.setMinimumWidth(400)
         table.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
-        table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
-        table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
-        table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         table.customContextMenuRequested.connect(self.handler_cls.as_slot(self))
-        self.table = table
+        self.table: QTableWidget = table
         self.update_table()
 
     def update_table(self) -> None:

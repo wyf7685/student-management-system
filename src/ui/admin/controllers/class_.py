@@ -91,4 +91,4 @@ class ClassController(BaseController[ClassDBManager]):
         mdb = self.db.major()
         for c in self.db.get_all_classes():
             m = check(mdb.get_major(c.major_id))
-            yield (c.class_id, c.name, m.name, c.year)
+            yield (c.class_id, c.name, c.major_id, m.name, c.year)

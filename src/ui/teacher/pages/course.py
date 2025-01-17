@@ -13,13 +13,13 @@ from PyQt6.QtWidgets import (
     QMenu,
     QPushButton,
     QSpinBox,
-    QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
 )
 
 from database import DBManager
 from ui.common.page import BasePage, PageTitle
+from ui.common.readonly_table import ReadonlyTableWidget
 
 
 class SemesterDialog(QDialog):
@@ -76,15 +76,9 @@ class CoursePage(BasePage):
         layout.addWidget(input_group_box)
 
         # 添加课程信息表格
-        self.course_table = QTableWidget()
-        self.course_table.setColumnCount(4)
-        self.course_table.setHorizontalHeaderLabels(
-            ["课程ID", "课程名称", "学期", "状态"]
-        )
+        self.course_table = ReadonlyTableWidget(["课程ID", "课程名称", "学期", "状态"])
         self.course_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.course_table.customContextMenuRequested.connect(
-            self.handle_list_context_menu
-        )
+        self.course_table.customContextMenuRequested.connect(self.handle_list_context_menu)
         header = self.course_table.horizontalHeader()
         if header is not None:
             header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
@@ -108,18 +102,14 @@ class CoursePage(BasePage):
         courses = db.search_course(keyword) if keyword else db.get_all_courses()
         teaching = {
             course.course_id: course.semester
-            for course in DBManager.course_teacher().get_courses_by_teacher(
-                self.teacher_id
-            )
+            for course in DBManager.course_teacher().get_courses_by_teacher(self.teacher_id)
         }
         courses.sort(key=lambda c: (c.course_id not in teaching, c.course_id))
 
         self.course_table.setRowCount(len(courses))
         for row, course in enumerate(courses):
             status = "正在授课" if course.course_id in teaching else "未授课"
-            semester_info = (
-                teaching.get(course.course_id, "")
-            )
+            semester_info = teaching.get(course.course_id, "")
 
             item_id = QTableWidgetItem(str(course.course_id))
             item_id.setFont(QFont("Arial", 12))
@@ -135,9 +125,6 @@ class CoursePage(BasePage):
 
             item_status = QTableWidgetItem(status)
             item_status.setFont(QFont("Arial", 12))
-            # item_status.setForeground(
-            #     QColor("blue") if course.course_id in teaching else QColor("black")
-            # )
             self.course_table.setItem(row, 3, item_status)
 
         self.teaching = teaching
@@ -165,9 +152,7 @@ class CoursePage(BasePage):
             dialog = SemesterDialog(self)
             if dialog.exec() == QDialog.DialogCode.Accepted:
                 semester = dialog.get_semester()
-                DBManager.course_teacher().add_course_teacher(
-                    course_id, self.teacher_id, semester
-                )
+                DBManager.course_teacher().add_course_teacher(course_id, self.teacher_id, semester)
 
         teach_action.triggered.connect(on_teach)
         menu.addAction(teach_action)
@@ -177,9 +162,7 @@ class CoursePage(BasePage):
         menu = QMenu(self)
         stop_action = QAction("停止授课", self)
         stop_action.triggered.connect(
-            lambda: DBManager.course_teacher().delete_course_teacher(
-                course_id, self.teacher_id
-            )
+            lambda: DBManager.course_teacher().delete_course_teacher(course_id, self.teacher_id)
         )
         menu.addAction(stop_action)
         return menu

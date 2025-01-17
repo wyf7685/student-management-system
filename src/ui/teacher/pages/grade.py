@@ -2,11 +2,11 @@ from PyQt6.QtWidgets import (
     QDialog,
     QFormLayout,
     QHBoxLayout,
+    QHeaderView,
     QLabel,
     QLineEdit,
     QMessageBox,
     QPushButton,
-    QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
     QWidget,
@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import (
 from database.manager import DBManager
 from ui.admin.common import BaseConfirmDialog
 from ui.common.page import BasePage, PageTitle
+from ui.common.readonly_table import ReadonlyTableWidget
 from ui.common.selection import SelectionCombo
 
 
@@ -70,11 +71,15 @@ class GradePage(BasePage):
         layout.addLayout(course_box)
 
         # 成绩表格
-        self.table = QTableWidget()
-        self.table.setColumnCount(6)
-        self.table.setHorizontalHeaderLabels(
-            ["学生ID", "学生姓名", "课程ID", "课程名", "成绩", "操作"]
-        )
+        labels = ["学生ID", "学生姓名", "课程ID", "课程名", "成绩", "操作"]
+        self.table = ReadonlyTableWidget(labels)
+        if header := self.table.horizontalHeader():
+            header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+            header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+            header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
+            header.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
+            header.setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch)
+            header.setSectionResizeMode(5, QHeaderView.ResizeMode.Stretch)
         layout.addWidget(self.table)
 
         self.setLayout(layout)
@@ -84,10 +89,7 @@ class GradePage(BasePage):
         teacher_id = int(self.get_user_id())
         combo = SelectionCombo(
             self,
-            [
-                (c.course_id, c.name)
-                for c in DBManager.course().get_courses_by_teacher(teacher_id)
-            ],
+            [(c.course_id, c.name) for c in DBManager.course().get_courses_by_teacher(teacher_id)],
             formatter=lambda c: f"{c[0]} - {c[1]}",
         )
         combo.currentIndexChanged.connect(self.update_table)

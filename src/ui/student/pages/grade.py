@@ -1,13 +1,13 @@
 from PyQt6.QtWidgets import (
     QHeaderView,
     QSizePolicy,
-    QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
 )
 
 from database.manager import DBManager
 from ui.common.page import BasePage, PageTitle
+from ui.common.readonly_table import ReadonlyTableWidget
 from utils import check
 
 
@@ -19,22 +19,13 @@ class GradePage(BasePage):
         layout = QVBoxLayout()
         layout.addWidget(PageTitle("成绩查询"))
 
-        # 创建一个 QTableWidget
-        self.table_widget = QTableWidget()
-        self.table_widget.setColumnCount(3)
-        self.table_widget.setHorizontalHeaderLabels(["课程名称", "成绩", "学期"])
-
-        # 设置表格的大小策略，使其填充可用空间
+        self.table_widget = ReadonlyTableWidget(["课程名称", "成绩", "学期"])
         self.table_widget.setSizePolicy(
-            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding,
         )
-
-        # 动态调整表格列宽，使每个列均匀分布
-        header = self.table_widget.horizontalHeader()
-        if header is not None:
-            header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
-            header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
-            header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
+        if header := self.table_widget.horizontalHeader():
+            header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
         # 获取成绩信息
         grades = DBManager.grade().get_all_grades()

@@ -76,9 +76,7 @@ class StudentController(BaseController[StudentDBManager]):
             # 转换日期格式
             birth_dt = datetime.strptime(birth, "%Y-%m-%d") if birth else None
             enroll_dt = (
-                datetime.strptime(enrollment_date, "%Y-%m-%d").date()
-                if enrollment_date
-                else None
+                datetime.strptime(enrollment_date, "%Y-%m-%d").date() if enrollment_date else None
             )
 
             # 更新数据

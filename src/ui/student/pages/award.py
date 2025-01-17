@@ -1,17 +1,33 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import (
-    QGroupBox,
-    QHBoxLayout,
-    QLabel,
-    QLineEdit,
-    QListWidget,
-    QListWidgetItem,
-    QPushButton,
-    QVBoxLayout,
-)
+from PyQt6.QtGui import QFont
+from PyQt6.QtWidgets import QListWidget, QListWidgetItem, QVBoxLayout
 
 from database.manager import DBManager
 from ui.common.page import BasePage, PageTitle
+
+AWARD_LIST_STYLESHEET = """
+QListWidget {
+    background-color: transparent;
+    border: 1px solid palette(mid);
+    border-radius: 5px;
+    padding: 5px;
+}
+QListWidget::item {
+    background-color: palette(base);
+    border: 1px solid palette(midlight);
+    border-radius: 5px;
+    margin: 5px;
+    padding: 10px;
+}
+QListWidget::item:hover {
+    background-color: palette(highlight);
+}
+QListWidget::item:selected {
+    background-color: palette(highlight);
+    font-weight: bold;
+    color: palette(text);  /* 使用系统默认字体颜色 */
+}
+"""
 
 
 class AwardPage(BasePage):
@@ -23,55 +39,30 @@ class AwardPage(BasePage):
         # 添加标题
         layout.addWidget(PageTitle("获奖查询"))
 
-        # 添加输入框和查询按钮
-        input_group_box = QGroupBox()
-        input_group_layout = QHBoxLayout()
-        input_group_box.setLayout(input_group_layout)
-
-        self.student_id_label = QLabel("请输入学号:")
-        self.student_id_input = QLineEdit()
-        self.search_button = QPushButton("查询")
-
-        input_group_layout.addWidget(self.student_id_label)
-        input_group_layout.addWidget(self.student_id_input)
-        input_group_layout.addWidget(self.search_button)
-
-        layout.addWidget(input_group_box)
-
         # 添加获奖信息列表
         self.awards_list = QListWidget()
+        self.awards_list.setStyleSheet(AWARD_LIST_STYLESHEET)
         layout.addWidget(self.awards_list)
 
-        # 连接查询按钮的点击事件
-        self.search_button.clicked.connect(self.search_awards)
-
         self.setLayout(layout)
+        self.update_awards()
 
-    def search_awards(self):
-        student_id = self.student_id_input.text()
-        if not student_id:
-            self.awards_list.clear()
-            self.awards_list.addItem("请输入学号")
-            return
+    def create_list_item(self, text: str) -> QListWidgetItem:
+        item = QListWidgetItem(text)
+        item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+        font = QFont(self.awards_list.font())
+        font.setPointSize(int(font.pointSize() * 1.5))
+        item.setFont(font)
+        return item
 
-        try:
-            student_id = int(student_id)
-        except ValueError:
-            self.awards_list.clear()
-            self.awards_list.addItem("学号必须是数字")
-            return
-
+    def update_awards(self):
         award_manager = DBManager.award()
-        awards = award_manager.get_awards_by_student(student_id)
+        awards = award_manager.get_awards_by_student(int(self.get_user_id()))
 
         self.awards_list.clear()
         if awards:
             for award in awards:
-                item_text = (
-                    f"奖项名称: {award.award_name}, 获奖日期: {award.award_date}"
-                )
-                item = QListWidgetItem(item_text)
-                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-                self.awards_list.addItem(item)
+                text = f"奖项名称: {award.award_name}, 获奖日期: {award.award_date}"
+                self.awards_list.addItem(self.create_list_item(text))
         else:
-            self.awards_list.addItem("没有找到相关奖项")
+            self.awards_list.addItem(self.create_list_item("没有找到相关奖项"))

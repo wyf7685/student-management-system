@@ -97,9 +97,7 @@ class EditDialog(BaseConfirmDialog):
         self.gender_input.addItems(["男", "女"])
         self.gender_input.setCurrentText(self.student_data[2])
         self.birth_input = QDateEdit()
-        self.birth_input.setDate(
-            datetime.strptime(self.student_data[3], "%Y-%m-%d").date()
-        )
+        self.birth_input.setDate(datetime.strptime(self.student_data[3], "%Y-%m-%d").date())
 
         self.phone_input = QLineEdit(self.student_data[4])
         self.email_input = QLineEdit(self.student_data[5])
@@ -108,9 +106,7 @@ class EditDialog(BaseConfirmDialog):
         self.class_selection = ClassSelectionCombo(self, int(self.student_data[8]))
 
         self.enrollment_input = QDateEdit()
-        self.enrollment_input.setDate(
-            datetime.strptime(self.student_data[9], "%Y-%m-%d").date()
-        )
+        self.enrollment_input.setDate(datetime.strptime(self.student_data[9], "%Y-%m-%d").date())
 
         # 添加到表单
         form_layout.addRow("学号:", self.id_label)

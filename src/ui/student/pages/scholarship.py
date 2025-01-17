@@ -7,13 +7,13 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QPushButton,
     QSizePolicy,
-    QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
 )
 
 from database.manager import DBManager
 from ui.common.page import BasePage
+from ui.common.readonly_table import ReadonlyTableWidget
 
 
 class ScholarshipPage(BasePage):
@@ -30,10 +30,8 @@ class ScholarshipPage(BasePage):
         layout.addWidget(title_label)
 
         # 创建一个 QTableWidget
-        self.table_widget = QTableWidget()
         labels = ["奖学金名称", "金额", "日期", "操作"]
-        self.table_widget.setColumnCount(len(labels))
-        self.table_widget.setHorizontalHeaderLabels(labels)
+        self.table_widget = ReadonlyTableWidget(labels)
 
         # 设置表格的大小策略，使其填充可用空间
         self.table_widget.setSizePolicy(
@@ -98,9 +96,7 @@ class ScholarshipPage(BasePage):
         # 使用 QTimer 单次触发延迟显示消息框，确保按钮文本更新完成
         QTimer.singleShot(
             0,
-            lambda: QMessageBox.information(
-                self, "申请奖学金", f"{scholarship_name} 申请中..."
-            ),
+            lambda: QMessageBox.information(self, "申请奖学金", f"{scholarship_name} 申请中..."),
         )
 
         # 模拟申请成功后的处理

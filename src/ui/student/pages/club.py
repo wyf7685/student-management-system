@@ -9,13 +9,13 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QMenu,
     QPushButton,
-    QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
 )
 
 from database import DBManager
 from ui.common.page import BasePage, PageTitle
+from ui.common.readonly_table import ReadonlyTableWidget
 
 
 class ClubPage(BasePage):
@@ -45,16 +45,11 @@ class ClubPage(BasePage):
         layout.addWidget(input_group_box)
 
         # 添加社团信息表格
-        self.clubs_table = QTableWidget()
-        self.clubs_table.setColumnCount(3)
-        self.clubs_table.setHorizontalHeaderLabels(["社团名称", "描述", "报名状态"])
+        self.clubs_table = ReadonlyTableWidget(["社团名称", "描述", "报名状态"])
         self.clubs_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.clubs_table.customContextMenuRequested.connect(
-            self.handle_list_context_menu
-        )
-        header = self.clubs_table.horizontalHeader()
-        if header is not None:
-            header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        self.clubs_table.customContextMenuRequested.connect(self.handle_list_context_menu)
+        if header := self.clubs_table.horizontalHeader():
+            header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
             header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
             header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
         layout.addWidget(self.clubs_table)
@@ -63,7 +58,7 @@ class ClubPage(BasePage):
         self.enrollment_frame = QFrame()
         self.enrollment_frame.setFrameShape(QFrame.Shape.StyledPanel)
         self.enrollment_frame.setFrameShadow(QFrame.Shadow.Raised)
-        self.enrollment_frame.setFixedHeight(200)  # 设置固定高度
+        self.enrollment_frame.setMinimumHeight(160)
         enrollment_layout = QVBoxLayout()
         self.enrollment_label = QLabel("请选择一个社团以查看报名信息")
         self.enrollment_label.setAlignment(Qt.AlignmentFlag.AlignTop)  # 文本对齐方式
@@ -89,9 +84,7 @@ class ClubPage(BasePage):
 
         joined = [
             club.club_id
-            for club in DBManager.student_club().get_clubs_by_student(
-                int(self.get_user_id())
-            )
+            for club in DBManager.student_club().get_clubs_by_student(int(self.get_user_id()))
         ]
         clubs.sort(key=lambda c: (c.club_id not in joined, c.club_id))
 
@@ -134,9 +127,7 @@ class ClubPage(BasePage):
         return menu
 
     def handle_join_action(self, club_id: int):
-        DBManager.student_club().add_student_club(
-            int(self.get_user_id()), club_id, "member"
-        )
+        DBManager.student_club().add_student_club(int(self.get_user_id()), club_id, "member")
         self.update_clubs_table()
 
     def handle_quit_action(self, club_id: int):
@@ -144,19 +135,11 @@ class ClubPage(BasePage):
         self.update_clubs_table()
 
     def update_enrollment_info(self, row: int, _: int):
-        # 确保 clubs 列表是最新的
-        if not hasattr(self, "clubs") or not self.clubs:
-            self.update_clubs_table()
-
         cid = self.clubs[row]
+        item = self.clubs_table.item(row, 0)
+        name = item.text() if item else "无描述"
         status = "报名中..." if cid in self.joined else "未报名..."
-        # 从原始的 clubs 数据中查找描述信息
-        club_data = next(
-            (club for club in DBManager.club().get_all_clubs() if club.club_id == cid),
-            None,
-        )
-        description = club_data.description if club_data else "无描述信息"
-
-        self.enrollment_label.setText(
-            f"社团ID: {cid}\n状态: {status}\n描述: {description}"
-        )
+        item = self.clubs_table.item(row, 1)
+        description = item.text() if item else "无描述"
+        text = f"社团ID: {cid}\n名称:{name}\n状态: {status}\n描述: {description}"
+        self.enrollment_label.setText(text)

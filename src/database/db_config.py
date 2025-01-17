@@ -2,7 +2,7 @@ from sqlalchemy import URL, Engine, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session, declared_attr, sessionmaker
 from sqlalchemy.util import immutabledict
 
-from config import config, SqliteConfig, ServerConfig
+from config import ServerConfig, SqliteConfig, config
 
 __token: object = None
 __engine: Engine | None = None
@@ -129,9 +129,7 @@ class Base(DeclarativeBase):
         # 将 CamelCase 类名转换为 snake_case 表名
         # 例如: StudentInfo -> student_info
         name = cls.__name__
-        return "".join(
-            f"_{c.lower()}" if c.isupper() else c.lower() for c in name
-        ).lstrip("_")
+        return "".join(f"_{c.lower()}" if c.isupper() else c.lower() for c in name).lstrip("_")
 
 
 def create_all():
