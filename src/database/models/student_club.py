@@ -17,4 +17,4 @@ class StudentClub(Base):
         ForeignKey(Club.club_id),
         primary_key=True,
     )
-    role: Mapped[str] = mapped_column(String, nullable=False)
+    role: Mapped[str] = mapped_column(String(256), nullable=False)

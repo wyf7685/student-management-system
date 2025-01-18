@@ -14,5 +14,5 @@ class Award(Base):
         ForeignKey(Student.student_id),
         nullable=False,
     )
-    award_name: Mapped[str] = mapped_column(String, nullable=False)
+    award_name: Mapped[str] = mapped_column(String(256), nullable=False)
     award_date: Mapped[datetime.date] = mapped_column(Date, nullable=False)

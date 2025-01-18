@@ -6,5 +6,5 @@ from ..db_config import Base
 
 class Club(Base):
     club_id: Mapped[int] = mapped_column(Integer, nullable=False, primary_key=True)
-    name: Mapped[str] = mapped_column(String, nullable=False)
-    description: Mapped[str] = mapped_column(String, nullable=False)
+    name: Mapped[str] = mapped_column(String(256), nullable=False)
+    description: Mapped[str] = mapped_column(String(1024), nullable=False)

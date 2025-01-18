@@ -11,12 +11,12 @@ class Scholarship(Base):
         primary_key=True,
         autoincrement=True,
     )
-    scholarship_name: Mapped[str] = mapped_column(String, nullable=False)
+    scholarship_name: Mapped[str] = mapped_column(String(256), nullable=False)
     student_id: Mapped[int] = mapped_column(
         Integer,
         ForeignKey(Student.student_id),
         nullable=False,
     )
     amount: Mapped[int] = mapped_column(Integer, nullable=False)
-    date_awarded: Mapped[str] = mapped_column(String, nullable=False)
-    description: Mapped[str] = mapped_column(String, nullable=True)
+    date_awarded: Mapped[str] = mapped_column(String(256), nullable=False)
+    description: Mapped[str] = mapped_column(String(256), nullable=True)

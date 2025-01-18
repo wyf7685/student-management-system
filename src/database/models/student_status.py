@@ -39,7 +39,7 @@ class StudentStatus(Base):
         CheckConstraint("status_code IN (1, 2, 3, 4, 5)"),
         nullable=False,
     )
-    description: Mapped[str] = mapped_column(String, nullable=True)
+    description: Mapped[str] = mapped_column(String(256), nullable=True)
     start_date: Mapped[datetime.date] = mapped_column(Date, nullable=False)
     end_date: Mapped[datetime.date] = mapped_column(Date, nullable=True)
     last_updated: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False)

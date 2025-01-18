@@ -20,4 +20,4 @@ class Grade(Base):
         primary_key=True,
     )
     score: Mapped[int] = mapped_column(Integer, nullable=False)
-    term: Mapped[str] = mapped_column(String, nullable=False)
+    term: Mapped[str] = mapped_column(String(256), nullable=False)

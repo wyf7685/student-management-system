@@ -7,7 +7,7 @@ from .major import Major
 
 class Class(Base):
     class_id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(String, nullable=False)
+    name: Mapped[str] = mapped_column(String(256), nullable=False)
     major_id: Mapped[int] = mapped_column(
         Integer,
         ForeignKey(Major.major_id),

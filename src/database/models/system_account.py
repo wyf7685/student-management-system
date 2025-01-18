@@ -22,12 +22,12 @@ class SystemAccount(Base):
         autoincrement=True,
     )
     role: Mapped[Literal["Student", "Teacher", "Admin"]] = mapped_column(
-        String,
+        String(256),
         CheckConstraint("role IN ('Student', 'Teacher', 'Admin')"),
         nullable=False,
     )
-    password: Mapped[str] = mapped_column(String, nullable=False)
-    salt: Mapped[str] = mapped_column(String, nullable=False)
+    password: Mapped[str] = mapped_column(String(256), nullable=False)
+    salt: Mapped[str] = mapped_column(String(256), nullable=False)
     student_id: Mapped[int | None] = mapped_column(
         Integer,
         ForeignKey(Student.student_id),
@@ -39,7 +39,7 @@ class SystemAccount(Base):
         nullable=True,
     )
     admin_id: Mapped[str | None] = mapped_column(
-        String,
+        String(256),
         nullable=True,
     )
 
