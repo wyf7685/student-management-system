@@ -130,10 +130,6 @@ class CollegeDBManager(DBManager):
         self.session.delete(college)
         self.session.commit()
 
-    @classmethod
-    def course_enrollment(cls):
-        return CourseEnrollmentDBManager()
-
 
 class MajorDBManager(DBManager):
     def get_major(self, major_id: int) -> Major | None:
