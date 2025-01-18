@@ -129,9 +129,9 @@ class EditDialog(BaseConfirmDialog):
             self.birth_input.date().toPyDate().strftime("%Y-%m-%d"),
             self.phone_input.text().strip(),
             self.email_input.text().strip(),
-            self.college_selection.get_selected(),
-            self.major_selection.get_selected(),
-            self.class_selection.get_selected(),
+            self.college_selection.get_selected()[0],
+            self.major_selection.get_selected()[0],
+            self.class_selection.get_selected()[0],
             self.enrollment_input.date().toPyDate().strftime("%Y-%m-%d"),
         )
 
