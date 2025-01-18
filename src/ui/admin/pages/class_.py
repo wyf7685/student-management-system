@@ -107,7 +107,7 @@ class ContextMenuHandler(BaseContextMenuHandler[ClassController]):
             cid := self.get_item_value(0),
             self.get_item_value(1),
             self.get_item_value(2),
-            self.get_item_value(3),
+            self.get_item_value(4),
         )
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.controller.update(

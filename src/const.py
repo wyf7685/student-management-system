@@ -6,7 +6,7 @@ AUTHORS = (
     ("lcj", "1613603747@qq.com"),
     ("wxy", "return543@qq.com"),
 )
-COPYRIGHT = "© 2025 All Rights Reserved"
+COPYRIGHT = "Copyright © 2025 All Rights Reserved"
 
 CONFIG_FILE = Path("settings.json")
 
