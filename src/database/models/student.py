@@ -34,7 +34,7 @@ class Student(Base):
         nullable=False,
     )
     email: Mapped[str] = mapped_column(
-        String(100),
+        String(50),
         CheckConstraint("email LIKE '%@%.%'"),
         nullable=False,
     )
