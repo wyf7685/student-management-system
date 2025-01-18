@@ -14,5 +14,5 @@ def check[T](value: T | None, /) -> T:
 
 def get_resource_path(relative_path: str):
     """获取资源的绝对路径"""
-    root = getattr(sys, "_MEIPASS", Path(__file__).parent.parent)
+    root = getattr(sys, "_MEIPASS", Path(__file__).parent)
     return (Path(root) / relative_path).absolute()

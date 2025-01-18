@@ -8,7 +8,7 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
-        ("app.ico", "."),
+        ("src/app.ico", "."),
         ("src/database/default.sql", "database"),
     ],
     hiddenimports=["mysqlclient", "psycopg2"],
@@ -42,5 +42,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon="app.ico",
+    icon="src/app.ico",
 )

@@ -155,9 +155,13 @@ def setup_default_data():
 
     from sqlalchemy import text
 
+    from utils import get_resource_path
+
     stmts = [
         s.strip()
-        for s in (Path(__file__).parent / "default.sql").read_text("utf-8").split(";")
+        for s in (Path(get_resource_path("database/default.sql")))
+        .read_text(encoding="utf-8")
+        .split(";")
         if s.strip() and not s.strip().startswith("--")
     ]
 
