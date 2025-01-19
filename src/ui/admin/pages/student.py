@@ -43,8 +43,8 @@ class AddDialog(BaseConfirmDialog):
         self.phone_input = QLineEdit()
         self.email_input = QLineEdit()
         self.college_selection = CollegeSelectionCombo(self)
-        self.major_selection = MajorSelectionCombo(self)
-        self.class_selection = ClassSelectionCombo(self)
+        self.major_selection = MajorSelectionCombo(self, self.college_selection)
+        self.class_selection = ClassSelectionCombo(self, self.major_selection)
         self.enrollment_input = QDateEdit()
 
         # 设置宽度
@@ -102,8 +102,16 @@ class EditDialog(BaseConfirmDialog):
         self.phone_input = QLineEdit(self.student_data[4])
         self.email_input = QLineEdit(self.student_data[5])
         self.college_selection = CollegeSelectionCombo(self, int(self.student_data[6]))
-        self.major_selection = MajorSelectionCombo(self, int(self.student_data[7]))
-        self.class_selection = ClassSelectionCombo(self, int(self.student_data[8]))
+        self.major_selection = MajorSelectionCombo(
+            self,
+            self.college_selection,
+            int(self.student_data[7]),
+        )
+        self.class_selection = ClassSelectionCombo(
+            self,
+            self.major_selection,
+            int(self.student_data[8]),
+        )
 
         self.enrollment_input = QDateEdit()
         self.enrollment_input.setDate(datetime.strptime(self.student_data[9], "%Y-%m-%d").date())

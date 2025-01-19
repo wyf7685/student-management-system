@@ -138,6 +138,9 @@ class MajorDBManager(DBManager):
     def get_all_majors(self):
         return self.session.query(Major).all()
 
+    def get_major_by_college(self, college_id: int) -> list[Major]:
+        return self.session.query(Major).filter_by(college_id=college_id).all()
+
     def exists_major(self, major_id: int):
         return self.session.query(Major).filter_by(major_id=major_id).count() > 0
 
@@ -176,6 +179,9 @@ class ClassDBManager(DBManager):
 
     def get_all_classes(self):
         return self.session.query(Class).all()
+
+    def get_class_by_major(self, major_id: int) -> list[Class]:
+        return self.session.query(Class).filter_by(major_id=major_id).all()
 
     def exists_class(self, class_id: int):
         return self.session.query(Class).filter_by(class_id=class_id).count() > 0

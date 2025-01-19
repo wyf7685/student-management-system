@@ -22,8 +22,8 @@ if TYPE_CHECKING:
     from PyQt6.QtGui import QAction
 
 
-class _ContextMenuHandlerParentTab[C, T: QTableWidget = QTableWidget](Protocol):
-    table: T
+class _ContextMenuHandlerParentTab[C](Protocol):
+    table: QTableWidget
     controller: C
 
 
@@ -103,20 +103,52 @@ class CollegeSelectionCombo(SelectionCombo):
 
 
 class MajorSelectionCombo(SelectionCombo):
-    def __init__(self, parent: QWidget, default: int | None = None) -> None:
+    def __init__(
+        self,
+        parent: QWidget,
+        college_selection: CollegeSelectionCombo,
+        default: int | None = None,
+    ) -> None:
         super().__init__(
             parent,
-            [(m.major_id, m.name) for m in DBManager.major().get_all_majors()],
+            [
+                (m.major_id, m.name)
+                for m in DBManager.major().get_major_by_college(college_selection.get_selected()[0])
+            ],
             lambda x: f"{x[0]} - {x[1]}",
             (lambda x: x[0] == default) if default is not None else None,
+        )
+        college_selection.currentIndexChanged.connect(
+            lambda: self.set_college(college_selection.get_selected()[0])
+        )
+
+    def set_college(self, college_id: int) -> None:
+        self.update_data(
+            [(m.major_id, m.name) for m in DBManager.major().get_major_by_college(college_id)]
         )
 
 
 class ClassSelectionCombo(SelectionCombo):
-    def __init__(self, parent: QWidget, default: int | None = None) -> None:
+    def __init__(
+        self,
+        parent: QWidget,
+        major_selection: MajorSelectionCombo,
+        default: int | None = None,
+    ) -> None:
         super().__init__(
             parent,
-            [(c.class_id, c.name) for c in DBManager.class_().get_all_classes()],
+            [
+                (c.class_id, c.name)
+                for c in DBManager.class_().get_class_by_major(major_selection.get_selected()[0])
+            ],
             lambda x: f"{x[0]} - {x[1]}",
             (lambda x: x[0] == default) if default is not None else None,
+        )
+        major_selection.currentIndexChanged.connect(
+            lambda: self.set_major(major_selection.get_selected()[0])
+        )
+
+    def set_major(self, major_id: int) -> None:
+        self.update_data(
+            [(c.class_id, c.name) for c in DBManager.class_().get_class_by_major(major_id)]
         )

@@ -110,7 +110,7 @@ class ContextMenuHandler(BaseContextMenuHandler[MajorController]):
         reply = QMessageBox.question(
             self.parent,
             "确认删除",
-            f"确定要删除学院 {self.get_item_value(1)} 吗？",
+            f"确定要删除专业 {self.get_item_value(1)} 吗？",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
         )
         if reply == QMessageBox.StandardButton.Yes:

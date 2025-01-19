@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import (
 from ..common import (
     BaseConfirmDialog,
     BaseContextMenuHandler,
+    CollegeSelectionCombo,
     MajorSelectionCombo,
     check,
 )
@@ -27,15 +28,23 @@ class AddDialog(BaseConfirmDialog):
 
         self.id_input = QLineEdit()
         self.name_input = QLineEdit()
-        self.major_selection = MajorSelectionCombo(self)
+        self.college_selection = CollegeSelectionCombo(self)
+        self.major_selection = MajorSelectionCombo(self, self.college_selection)
         self.year_input = QLineEdit()
+
         self.name_input.setFixedWidth(200)
+        self.college_selection.currentIndexChanged.connect(self.on_college_selected)
 
         form_layout.addRow("班级代码:", self.id_input)
         form_layout.addRow("班级名称:", self.name_input)
+        form_layout.addRow("学院:", self.college_selection)
         form_layout.addRow("专业:", self.major_selection)
         form_layout.addRow("年级:", self.year_input)
+
         layout.addLayout(form_layout)
+
+    def on_college_selected(self):
+        self.major_selection.set_college(self.college_selection.get_selected()[0])
 
     def get_class_id(self) -> str:
         return self.id_input.text().strip()
@@ -70,12 +79,15 @@ class EditDialog(BaseConfirmDialog):
 
         self.id_label = QLabel(self.class_id)
         self.name_input = QLineEdit(self.name)
-        self.major_selection = MajorSelectionCombo(self, int(self.major_id))
+        self.college_selection = CollegeSelectionCombo(self)
+        self.major_selection = MajorSelectionCombo(self, self.college_selection, int(self.major_id))
         self.year_input = QLineEdit(self.year)
+
         self.name_input.setFixedWidth(200)
 
         form_layout.addRow("班级代码:", self.id_label)
         form_layout.addRow("班级名称:", self.name_input)
+        form_layout.addRow("学院:", self.college_selection)
         form_layout.addRow("专业:", self.major_selection)
         form_layout.addRow("年级:", self.year_input)
         layout.addLayout(form_layout)

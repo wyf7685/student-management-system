@@ -14,6 +14,8 @@ class SelectionCombo[T](QComboBox):
         super().__init__(parent)
 
         self.inner_data = inner_data
+        self.formatter = formatter
+
         for data in inner_data:
             self.addItem(formatter(data))
             if default_pred is not None and default_pred(data):
@@ -21,3 +23,12 @@ class SelectionCombo[T](QComboBox):
 
     def get_selected(self) -> T:
         return self.inner_data[self.currentIndex()]
+
+    def update_data(self, inner_data: list[T]) -> None:
+        self.clear()
+
+        self.inner_data = inner_data
+        for data in inner_data:
+            self.addItem(self.formatter(data))
+
+        self.setCurrentIndex(0)
