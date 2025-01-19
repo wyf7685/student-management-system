@@ -56,7 +56,7 @@ def _create_sql_server_engine(config: ServerConfig) -> Engine:
                 cursor.execute(f"SET IDENTITY_INSERT {table_name} ON")
 
     @event.listens_for(engine, "after_cursor_execute")
-    def _(__, cursor, statement, *_):
+    def _(__, cursor, statement: str, *_):
         if statement.strip().upper().startswith("INSERT"):
             table_name = statement.split()[2].strip()
             if table_name not in skip_table_name:
